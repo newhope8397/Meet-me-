@@ -111,7 +111,7 @@
             border-color: #7c5cff;
         }
 
-        .username-hint {
+        .field-hint {
             margin-top: 7px;
 
             color: #8f98aa;
@@ -185,6 +185,11 @@
             transform: scale(0.98);
         }
 
+        .create-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .login-link {
             text-align: center;
 
@@ -215,6 +220,29 @@
         <p class="description">
             Create your Meet Me identity without using a phone number.
         </p>
+
+
+        <!-- Email -->
+
+        <div class="input-box">
+
+            <label for="email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+            >
+
+            <p class="field-hint">
+                Your email is private and will not be shown to other users.
+            </p>
+
+        </div>
 
 
         <!-- Display Name -->
@@ -254,7 +282,7 @@
                 required
             >
 
-            <p class="username-hint">
+            <p class="field-hint">
                 Your username is unique and can be shared with others
                 so they can find you on Meet Me.
             </p>
@@ -321,7 +349,20 @@
     </div>
 
 
-    <script>
+    <!-- Firebase -->
+
+    <script type="module">
+
+        import { app } from "./js/firebase.js";
+
+        import {
+            getAuth,
+            createUserWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+        const auth = getAuth(app);
+
 
         /* =========================
            PASSWORD SHOW / HIDE
@@ -357,14 +398,14 @@
                     "aria-label",
                     "Show password"
                 );
+
             }
 
         });
 
 
         /* =========================
-           USERNAME CHECK
-           TEMPORARY LOCAL VERSION
+           USERNAME FORMAT CHECK
         ========================= */
 
         const usernameInput =
@@ -388,13 +429,9 @@
             }
 
 
-            /* Remove @ if user types it */
-
             username =
                 username.replace(/^@/, "");
 
-
-            /* Allow only letters, numbers, underscore and dot */
 
             if (!/^[a-z0-9._]+$/.test(username)) {
 
@@ -409,11 +446,6 @@
 
             usernameInput.value = username;
 
-
-            /*
-                Firebase will perform the real global
-                username availability check later.
-            */
 
             usernameStatus.textContent =
                 "Username format looks good.";
@@ -431,7 +463,13 @@
             document.getElementById("createBtn");
 
 
-        createBtn.addEventListener("click", () => {
+        createBtn.addEventListener("click", async () => {
+
+            const email =
+                document.getElementById("email")
+                .value
+                .trim();
+
 
             const displayName =
                 document.getElementById("displayName")
@@ -445,6 +483,14 @@
 
             const password =
                 passwordInput.value;
+
+
+            if (!email) {
+
+                alert("Please enter your email address.");
+
+                return;
+            }
 
 
             if (!displayName) {
@@ -487,9 +533,76 @@
             }
 
 
-            alert(
-                "Account creation will be connected to Firebase next."
-            );
+            createBtn.disabled = true;
+
+            createBtn.textContent =
+                "Creating Account...";
+
+
+            try {
+
+                const userCredential =
+                    await createUserWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+
+                console.log(
+                    "Firebase user created:",
+                    userCredential.user.uid
+                );
+
+
+                alert(
+                    "Your account was created successfully!"
+                );
+
+
+                window.location.href =
+                    "index.html";
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                if (error.code === "auth/email-already-in-use") {
+
+                    alert(
+                        "This email is already registered."
+                    );
+
+                } else if (error.code === "auth/invalid-email") {
+
+                    alert(
+                        "Please enter a valid email address."
+                    );
+
+                } else if (error.code === "auth/weak-password") {
+
+                    alert(
+                        "Your password is too weak."
+                    );
+
+                } else {
+
+                    alert(
+                        "Something went wrong: " +
+                        error.message
+                    );
+
+                }
+
+
+                createBtn.disabled = false;
+
+                createBtn.textContent =
+                    "Create Account";
+
+            }
 
         });
 
