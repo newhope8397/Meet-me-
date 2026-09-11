@@ -8,69 +8,65 @@
 
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
             min-height: 100vh;
-            font-family: Arial, sans-serif;
-            background: #0b0b12;
-            color: white;
-
             display: flex;
             justify-content: center;
             align-items: center;
 
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(circle at top, #18243d, #080b12 60%);
+
+            color: white;
             padding: 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 430px;
+            max-width: 420px;
+
+            padding: 30px;
+
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
         }
 
         .back {
             display: inline-block;
             margin-bottom: 25px;
 
-            color: #a5a5b5;
+            color: #aab8ff;
             text-decoration: none;
             font-size: 14px;
         }
 
-        .back:hover {
-            color: white;
-        }
-
-        .card {
-            background: #151520;
-            border: 1px solid #292939;
-            border-radius: 24px;
-            padding: 28px;
-        }
-
         .logo {
-            width: 60px;
-            height: 60px;
-
-            border-radius: 18px;
-
-            background: linear-gradient(
-                135deg,
-                #7c3aed,
-                #06b6d4
-            );
+            width: 55px;
+            height: 55px;
 
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
 
-            font-size: 28px;
+            margin-bottom: 20px;
+
+            border-radius: 16px;
+
+            background: linear-gradient(135deg, #7c5cff, #25d9ff);
+
+            font-size: 27px;
             font-weight: bold;
-
-            margin-bottom: 22px;
         }
 
         h1 {
@@ -79,78 +75,106 @@
         }
 
         .description {
-            color: #9999aa;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 28px;
+            color: #aeb6c7;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .input-box {
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
-            font-size: 13px;
-            color: #cfcfdd;
             margin-bottom: 8px;
+
+            font-size: 14px;
+            color: #dce1eb;
         }
 
         input {
             width: 100%;
+            padding: 14px 15px;
 
-            padding: 15px;
-
-            border-radius: 13px;
-
-            border: 1px solid #303044;
-
-            background: #0f0f18;
-
-            color: white;
-
-            font-size: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
 
             outline: none;
 
-            margin-bottom: 18px;
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+
+            font-size: 15px;
         }
 
         input:focus {
-            border-color: #7c3aed;
+            border-color: #7c5cff;
+        }
+
+        .username-hint {
+            margin-top: 7px;
+
+            color: #8f98aa;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .username-status {
+            margin-top: 7px;
+            font-size: 13px;
+        }
+
+        .password-box {
+            position: relative;
+        }
+
+        .password-box input {
+            padding-right: 50px;
+        }
+
+        .eye-btn {
+            position: absolute;
+
+            right: 10px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: none;
+            background: transparent;
+
+            cursor: pointer;
+
+            font-size: 20px;
+            padding: 5px;
         }
 
         .info {
-            background: #1b1b28;
+            margin: 5px 0 22px;
 
-            border: 1px solid #303044;
+            padding: 13px 14px;
 
-            border-radius: 13px;
+            border-radius: 12px;
 
-            padding: 14px;
+            background: rgba(124, 92, 255, 0.09);
+            border: 1px solid rgba(124, 92, 255, 0.18);
 
-            margin-bottom: 22px;
+            color: #b9c1d2;
 
-            color: #9d9daf;
-
-            font-size: 12px;
-
+            font-size: 13px;
             line-height: 1.5;
         }
 
         .create-btn {
             width: 100%;
-
-            padding: 16px;
+            padding: 14px;
 
             border: none;
+            border-radius: 12px;
 
-            border-radius: 14px;
-
-            background: linear-gradient(
-                135deg,
-                #7c3aed,
-                #06b6d4
-            );
+            background: linear-gradient(135deg, #7c5cff, #25d9ff);
 
             color: white;
-
             font-size: 16px;
             font-weight: bold;
 
@@ -164,181 +188,311 @@
         .login-link {
             text-align: center;
 
-            margin-top: 20px;
+            margin-top: 22px;
 
-            font-size: 13px;
-
-            color: #888899;
+            color: #aeb6c7;
+            font-size: 14px;
         }
 
         .login-link a {
-            color: #a78bfa;
+            color: #aab8ff;
             text-decoration: none;
+            font-weight: bold;
         }
-        .password-box {
-    position: relative;
-    width: 100%;
-}
-
-.password-box input {
-    width: 100%;
-    padding-right: 50px;
-}
-
-.eye-btn {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-
-    border: none;
-    background: transparent;
-    cursor: pointer;
-
-    font-size: 20px;
-    padding: 5px;
-}
     </style>
 </head>
 
 <body>
 
-    <main class="container">
+    <div class="container">
 
-        <a href="index.html" class="back">
-            ← Back
-        </a>
+        <a href="index.html" class="back">← Back</a>
 
-        <section class="card">
+        <div class="logo">M</div>
 
-            <div class="logo">
-                M
-            </div>
+        <h1>Create your account</h1>
 
-            <h1>
-                Create your Meet Me account
-            </h1>
+        <p class="description">
+            Create your Meet Me identity without using a phone number.
+        </p>
 
-            <p class="description">
-                Your phone number is not required.
-                Choose the identity you want people
-                to see on Meet Me.
-            </p>
 
+        <!-- Display Name -->
+
+        <div class="input-box">
+
+            <label for="displayName">
+                Display Name
+            </label>
+
+            <input
+                type="text"
+                id="displayName"
+                placeholder="What should people see?"
+                maxlength="40"
+                autocomplete="name"
+                required
+            >
+
+        </div>
+
+
+        <!-- Username -->
+
+        <div class="input-box">
 
             <label for="username">
-                Choose your username
+                Username
             </label>
 
             <input
                 type="text"
                 id="username"
-                placeholder="e.g. TheKing"
+                placeholder="@yourusername"
                 maxlength="30"
-                autocomplete="off"
+                autocomplete="username"
+                required
             >
 
+            <p class="username-hint">
+                Your username is unique and can be shared with others
+                so they can find you on Meet Me.
+            </p>
+
+            <p
+                class="username-status"
+                id="usernameStatus">
+            </p>
+
+        </div>
+
+
+        <!-- Password -->
+
+        <div class="input-box">
 
             <label for="password">
-                Create a password
+                Password
             </label>
 
             <div class="password-box">
-    <input
-        type="password"
-        id="password"
-        placeholder="Create a password"
-        required
-    >
 
-    <button
-        type="button"
-        class="eye-btn"
-        id="togglePassword"
-        aria-label="Show password">
-        👁️
-    </button>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Create a password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="eye-btn"
+                    id="togglePassword"
+                    aria-label="Show password">
+                    👁️
+                </button>
+
             </div>
 
-
-            <div class="info">
-                🔒 Your password will eventually be securely
-                handled by the Meet Me account system.
-                Never share your password with another person.
-            </div>
+        </div>
 
 
-            <button
-                class="create-btn"
-                id="createBtn">
-
-                Continue
-
-            </button>
+        <div class="info">
+            Your phone number is not required. Your display name can
+            be the same as someone else's, but your username must be
+            unique.
+        </div>
 
 
-            <div class="login-link">
-                Already have an account?
-                <a href="#">
-                    Log in
-                </a>
-            </div>
+        <button
+            class="create-btn"
+            id="createBtn">
+            Create Account
+        </button>
 
-        </section>
 
-    </main>
+        <p class="login-link">
+            Already have an account?
+            <a href="login.html">Log In</a>
+        </p>
+
+    </div>
 
 
     <script>
 
-        document
-            .getElementById("createBtn")
-            .addEventListener("click", function () {
+        /* =========================
+           PASSWORD SHOW / HIDE
+        ========================= */
 
-                const username =
-                    document
-                    .getElementById("username")
-                    .value
-                    .trim();
+        const passwordInput =
+            document.getElementById("password");
 
-                const password =
-                    document
-                    .getElementById("password")
-                    .value;
+        const togglePassword =
+            document.getElementById("togglePassword");
 
-                if (!username) {
-                    alert("Please choose a username.");
-                    return;
-                }
 
-                if (!password) {
-                    alert("Please create a password.");
-                    return;
-                }
+        togglePassword.addEventListener("click", () => {
 
-                alert(
-                    "Great! The real account system will be connected next."
+            if (passwordInput.type === "password") {
+
+                passwordInput.type = "text";
+
+                togglePassword.textContent = "🙈";
+
+                togglePassword.setAttribute(
+                    "aria-label",
+                    "Hide password"
                 );
 
-            });
+            } else {
 
-    </script>
-    
-    <script>
-const passwordInput = document.getElementById("password");
-const togglePassword = document.getElementById("togglePassword");
+                passwordInput.type = "password";
 
-togglePassword.addEventListener("click", () => {
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        togglePassword.textContent = "🙈";
-        togglePassword.setAttribute("aria-label", "Hide password");
-    } else {
-        passwordInput.type = "password";
-        togglePassword.textContent = "👁️";
-        togglePassword.setAttribute("aria-label", "Show password");
-    }
-});
+                togglePassword.textContent = "👁️";
+
+                togglePassword.setAttribute(
+                    "aria-label",
+                    "Show password"
+                );
+            }
+
+        });
+
+
+        /* =========================
+           USERNAME CHECK
+           TEMPORARY LOCAL VERSION
+        ========================= */
+
+        const usernameInput =
+            document.getElementById("username");
+
+        const usernameStatus =
+            document.getElementById("usernameStatus");
+
+
+        usernameInput.addEventListener("input", () => {
+
+            let username =
+                usernameInput.value.trim().toLowerCase();
+
+
+            if (username === "") {
+
+                usernameStatus.textContent = "";
+
+                return;
+            }
+
+
+            /* Remove @ if user types it */
+
+            username =
+                username.replace(/^@/, "");
+
+
+            /* Allow only letters, numbers, underscore and dot */
+
+            if (!/^[a-z0-9._]+$/.test(username)) {
+
+                usernameStatus.textContent =
+                    "Username can contain letters, numbers, dots and underscores.";
+
+                usernameStatus.style.color = "#ffb86b";
+
+                return;
+            }
+
+
+            usernameInput.value = username;
+
+
+            /*
+                Firebase will perform the real global
+                username availability check later.
+            */
+
+            usernameStatus.textContent =
+                "Username format looks good.";
+
+            usernameStatus.style.color = "#9be7b0";
+
+        });
+
+
+        /* =========================
+           CREATE ACCOUNT
+        ========================= */
+
+        const createBtn =
+            document.getElementById("createBtn");
+
+
+        createBtn.addEventListener("click", () => {
+
+            const displayName =
+                document.getElementById("displayName")
+                .value
+                .trim();
+
+
+            const username =
+                usernameInput.value.trim();
+
+
+            const password =
+                passwordInput.value;
+
+
+            if (!displayName) {
+
+                alert("Please enter your display name.");
+
+                return;
+            }
+
+
+            if (!username) {
+
+                alert("Please choose a username.");
+
+                return;
+            }
+
+
+            if (username.length < 3) {
+
+                alert("Username must be at least 3 characters long.");
+
+                return;
+            }
+
+
+            if (!password) {
+
+                alert("Please create a password.");
+
+                return;
+            }
+
+
+            if (password.length < 8) {
+
+                alert("Password must be at least 8 characters long.");
+
+                return;
+            }
+
+
+            alert(
+                "Account creation will be connected to Firebase next."
+            );
+
+        });
+
     </script>
 
 </body>
