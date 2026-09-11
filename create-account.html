@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account - Meet Me</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #0b0b12;
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 430px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 25px;
+
+            color: #a5a5b5;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back:hover {
+            color: white;
+        }
+
+        .card {
+            background: #151520;
+            border: 1px solid #292939;
+            border-radius: 24px;
+            padding: 28px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+
+            border-radius: 18px;
+
+            background: linear-gradient(
+                135deg,
+                #7c3aed,
+                #06b6d4
+            );
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 28px;
+            font-weight: bold;
+
+            margin-bottom: 22px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #9999aa;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #cfcfdd;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 15px;
+
+            border-radius: 13px;
+
+            border: 1px solid #303044;
+
+            background: #0f0f18;
+
+            color: white;
+
+            font-size: 15px;
+
+            outline: none;
+
+            margin-bottom: 18px;
+        }
+
+        input:focus {
+            border-color: #7c3aed;
+        }
+
+        .info {
+            background: #1b1b28;
+
+            border: 1px solid #303044;
+
+            border-radius: 13px;
+
+            padding: 14px;
+
+            margin-bottom: 22px;
+
+            color: #9d9daf;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+        .create-btn {
+            width: 100%;
+
+            padding: 16px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background: linear-gradient(
+                135deg,
+                #7c3aed,
+                #06b6d4
+            );
+
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .create-btn:active {
+            transform: scale(0.98);
+        }
+
+        .login-link {
+            text-align: center;
+
+            margin-top: 20px;
+
+            font-size: 13px;
+
+            color: #888899;
+        }
+
+        .login-link a {
+            color: #a78bfa;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <a href="index.html" class="back">
+            ← Back
+        </a>
+
+        <section class="card">
+
+            <div class="logo">
+                M
+            </div>
+
+            <h1>
+                Create your Meet Me account
+            </h1>
+
+            <p class="description">
+                Your phone number is not required.
+                Choose the identity you want people
+                to see on Meet Me.
+            </p>
+
+
+            <label for="username">
+                Choose your username
+            </label>
+
+            <input
+                type="text"
+                id="username"
+                placeholder="e.g. TheKing"
+                maxlength="30"
+                autocomplete="off"
+            >
+
+
+            <label for="password">
+                Create a password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Create a password"
+                autocomplete="new-password"
+            >
+
+
+            <div class="info">
+                🔒 Your password will eventually be securely
+                handled by the Meet Me account system.
+                Never share your password with another person.
+            </div>
+
+
+            <button
+                class="create-btn"
+                id="createBtn">
+
+                Continue
+
+            </button>
+
+
+            <div class="login-link">
+                Already have an account?
+                <a href="#">
+                    Log in
+                </a>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        document
+            .getElementById("createBtn")
+            .addEventListener("click", function () {
+
+                const username =
+                    document
+                    .getElementById("username")
+                    .value
+                    .trim();
+
+                const password =
+                    document
+                    .getElementById("password")
+                    .value;
+
+                if (!username) {
+                    alert("Please choose a username.");
+                    return;
+                }
+
+                if (!password) {
+                    alert("Please create a password.");
+                    return;
+                }
+
+                alert(
+                    "Great! The real account system will be connected next."
+                );
+
+            });
+
+    </script>
+
+</body>
+</html>
