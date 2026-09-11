@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
 const firebaseConfig = {
-apiKey: "YOUR_API_KEY",
+apiKey: "AIzaSyCm2E61Ek-fY5xxAx48cIthDEsr05ajDds",
   authDomain: "meet-me-1ee42.firebaseapp.com",
   projectId: "meet-me-1ee42",
   storageBucket: "meet-me-1ee42.firebasestorage.app",
