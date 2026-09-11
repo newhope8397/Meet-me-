@@ -175,6 +175,29 @@
             color: #a78bfa;
             text-decoration: none;
         }
+        .password-box {
+    position: relative;
+    width: 100%;
+}
+
+.password-box input {
+    width: 100%;
+    padding-right: 50px;
+}
+
+.eye-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    border: none;
+    background: transparent;
+    cursor: pointer;
+
+    font-size: 20px;
+    padding: 5px;
+}
     </style>
 </head>
 
@@ -299,6 +322,23 @@
 
             });
 
+    </script>
+    
+    <script>
+const passwordInput = document.getElementById("password");
+const togglePassword = document.getElementById("togglePassword");
+
+togglePassword.addEventListener("click", () => {
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        togglePassword.textContent = "🙈";
+        togglePassword.setAttribute("aria-label", "Hide password");
+    } else {
+        passwordInput.type = "password";
+        togglePassword.textContent = "👁️";
+        togglePassword.setAttribute("aria-label", "Show password");
+    }
+});
     </script>
 
 </body>
