@@ -170,6 +170,11 @@
             transform: scale(0.98);
         }
 
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .create-link {
             text-align: center;
 
@@ -208,22 +213,26 @@
         </p>
 
 
+        <!-- Email -->
+
         <div class="input-box">
 
-            <label for="loginId">
-                Username
+            <label for="loginEmail">
+                Email Address
             </label>
 
             <input
-                type="text"
-                id="loginId"
-                placeholder="Enter your username"
-                autocomplete="username"
+                type="email"
+                id="loginEmail"
+                placeholder="Enter your email"
+                autocomplete="email"
                 required
             >
 
         </div>
 
+
+        <!-- Password -->
 
         <div class="input-box">
 
@@ -254,7 +263,7 @@
         </div>
 
 
-        <a href="#" class="forgot">
+        <a href="#" class="forgot" id="forgotPassword">
             Forgot password?
         </a>
 
@@ -279,7 +288,20 @@
     </div>
 
 
-    <script>
+    <!-- Firebase -->
+
+    <script type="module">
+
+        import { app } from "./js/firebase.js";
+
+        import {
+            getAuth,
+            signInWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+        const auth = getAuth(app);
+
 
         /* =========================
            PASSWORD SHOW / HIDE
@@ -322,17 +344,17 @@
 
 
         /* =========================
-           LOGIN BUTTON
+           LOGIN
         ========================= */
 
         const loginBtn =
             document.getElementById("loginBtn");
 
 
-        loginBtn.addEventListener("click", () => {
+        loginBtn.addEventListener("click", async () => {
 
-            const loginId =
-                document.getElementById("loginId")
+            const email =
+                document.getElementById("loginEmail")
                 .value
                 .trim();
 
@@ -340,18 +362,104 @@
                 passwordInput.value;
 
 
-            if (!loginId || !password) {
+            if (!email || !password) {
 
                 alert(
-                    "Please enter your username and password."
+                    "Please enter your email and password."
                 );
 
                 return;
             }
 
 
+            loginBtn.disabled = true;
+
+            loginBtn.textContent =
+                "Logging In...";
+
+
+            try {
+
+                const userCredential =
+                    await signInWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+
+                console.log(
+                    "Logged in user:",
+                    userCredential.user.uid
+                );
+
+
+                alert(
+                    "Login successful!"
+                );
+
+
+                window.location.href =
+                    "index.html";
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                if (
+                    error.code === "auth/invalid-credential" ||
+                    error.code === "auth/wrong-password" ||
+                    error.code === "auth/user-not-found"
+                ) {
+
+                    alert(
+                        "Incorrect email or password."
+                    );
+
+                } else if (
+                    error.code === "auth/invalid-email"
+                ) {
+
+                    alert(
+                        "Please enter a valid email address."
+                    );
+
+                } else {
+
+                    alert(
+                        "Something went wrong: " +
+                        error.message
+                    );
+
+                }
+
+
+                loginBtn.disabled = false;
+
+                loginBtn.textContent =
+                    "Log In";
+
+            }
+
+        });
+
+
+        /* =========================
+           FORGOT PASSWORD
+        ========================= */
+
+        const forgotPassword =
+            document.getElementById("forgotPassword");
+
+
+        forgotPassword.addEventListener("click", (event) => {
+
+            event.preventDefault();
+
             alert(
-                "Login system will be connected next."
+                "Password recovery will be connected next."
             );
 
         });
