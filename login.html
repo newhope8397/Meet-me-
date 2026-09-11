@@ -1,1 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Log In - Meet Me</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(circle at top, #18243d, #080b12 60%);
+
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+
+            padding: 30px;
+
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 25px;
+
+            color: #aab8ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 20px;
+
+            border-radius: 16px;
+
+            background: linear-gradient(135deg, #7c5cff, #25d9ff);
+
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #aeb6c7;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .input-box {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+
+            font-size: 14px;
+            color: #dce1eb;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+
+            outline: none;
+
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+
+            font-size: 15px;
+        }
+
+        input:focus {
+            border-color: #7c5cff;
+        }
+
+        .password-box {
+            position: relative;
+        }
+
+        .password-box input {
+            padding-right: 50px;
+        }
+
+        .eye-btn {
+            position: absolute;
+
+            right: 10px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: none;
+            background: transparent;
+
+            cursor: pointer;
+
+            font-size: 20px;
+            padding: 5px;
+        }
+
+        .forgot {
+            display: block;
+
+            text-align: right;
+
+            margin-top: -5px;
+            margin-bottom: 20px;
+
+            color: #aab8ff;
+            text-decoration: none;
+
+            font-size: 13px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: linear-gradient(135deg, #7c5cff, #25d9ff);
+
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .create-link {
+            text-align: center;
+
+            margin-top: 22px;
+
+            color: #aeb6c7;
+            font-size: 14px;
+        }
+
+        .create-link a {
+            color: #aab8ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <a href="index.html" class="back">
+            ← Back
+        </a>
+
+        <div class="logo">
+            M
+        </div>
+
+        <h1>
+            Welcome back
+        </h1>
+
+        <p class="description">
+            Log in to your Meet Me account without using a phone number.
+        </p>
+
+
+        <div class="input-box">
+
+            <label for="loginId">
+                Username
+            </label>
+
+            <input
+                type="text"
+                id="loginId"
+                placeholder="Enter your username"
+                autocomplete="username"
+                required
+            >
+
+        </div>
+
+
+        <div class="input-box">
+
+            <label for="password">
+                Password
+            </label>
+
+            <div class="password-box">
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="eye-btn"
+                    id="togglePassword"
+                    aria-label="Show password">
+                    👁️
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <a href="#" class="forgot">
+            Forgot password?
+        </a>
+
+
+        <button
+            class="login-btn"
+            id="loginBtn">
+            Log In
+        </button>
+
+
+        <p class="create-link">
+
+            Don't have an account?
+
+            <a href="create-account.html">
+                Create Account
+            </a>
+
+        </p>
+
+    </div>
+
+
+    <script>
+
+        /* =========================
+           PASSWORD SHOW / HIDE
+        ========================= */
+
+        const passwordInput =
+            document.getElementById("password");
+
+        const togglePassword =
+            document.getElementById("togglePassword");
+
+
+        togglePassword.addEventListener("click", () => {
+
+            if (passwordInput.type === "password") {
+
+                passwordInput.type = "text";
+
+                togglePassword.textContent = "🙈";
+
+                togglePassword.setAttribute(
+                    "aria-label",
+                    "Hide password"
+                );
+
+            } else {
+
+                passwordInput.type = "password";
+
+                togglePassword.textContent = "👁️";
+
+                togglePassword.setAttribute(
+                    "aria-label",
+                    "Show password"
+                );
+
+            }
+
+        });
+
+
+        /* =========================
+           LOGIN BUTTON
+        ========================= */
+
+        const loginBtn =
+            document.getElementById("loginBtn");
+
+
+        loginBtn.addEventListener("click", () => {
+
+            const loginId =
+                document.getElementById("loginId")
+                .value
+                .trim();
+
+            const password =
+                passwordInput.value;
+
+
+            if (!loginId || !password) {
+
+                alert(
+                    "Please enter your username and password."
+                );
+
+                return;
+            }
+
+
+            alert(
+                "Login system will be connected next."
+            );
+
+        });
+
+    </script>
+
+</body>
+</html>
