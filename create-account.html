@@ -220,12 +220,22 @@
                 Create a password
             </label>
 
-            <input
-                type="password"
-                id="password"
-                placeholder="Create a password"
-                autocomplete="new-password"
-            >
+            <div class="password-box">
+    <input
+        type="password"
+        id="password"
+        placeholder="Create a password"
+        required
+    >
+
+    <button
+        type="button"
+        class="eye-btn"
+        id="togglePassword"
+        aria-label="Show password">
+        👁️
+    </button>
+            </div>
 
 
             <div class="info">
