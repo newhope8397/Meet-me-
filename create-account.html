@@ -559,54 +559,113 @@
                     "Your account was created successfully!"
                 );
 
+<script type="module">
+    import { app } from "./js/firebase.js";
 
-                window.location.href =
-                    "index.html";
+    import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        deleteUser
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
+    import {
+        getFirestore,
+        doc,
+        runTransaction,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-            } catch (error) {
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-                console.error(error);
+    const form = document.getElementById("createAccountForm");
 
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-                if (error.code === "auth/email-already-in-use") {
+        const email = document.getElementById("email").value.trim();
+        const displayName = document.getElementById("displayName").value.trim();
 
-                    alert(
-                        "This email is already registered."
-                    );
+        let username = document.getElementById("username").value.trim().toLowerCase();
+        username = username.replace(/^@/, "");
 
-                } else if (error.code === "auth/invalid-email") {
+        const password = document.getElementById("password").value;
 
-                    alert(
-                        "Please enter a valid email address."
-                    );
+        if (!email || !displayName || !username || !password) {
+            alert("Please fill in all fields.");
+            return;
+        }
 
-                } else if (error.code === "auth/weak-password") {
+        if (!/^[a-z0-9._]+$/.test(username)) {
+            alert("Username can only contain letters, numbers, dots and underscores.");
+            return;
+        }
 
-                    alert(
-                        "Your password is too weak."
-                    );
+        if (password.length < 8) {
+            alert("Password must be at least 8 characters long.");
+            return;
+        }
 
-                } else {
+        try {
+            // Create Firebase Authentication account
+            const userCredential =
+                await createUserWithEmailAndPassword(auth, email, password);
 
-                    alert(
-                        "Something went wrong: " +
-                        error.message
-                    );
+            const user = userCredential.user;
 
+            // Create the username and user profile atomically
+            await runTransaction(db, async (transaction) => {
+                const usernameRef = doc(db, "usernames", username);
+                const userRef = doc(db, "users", user.uid);
+
+                const usernameSnapshot =
+                    await transaction.get(usernameRef);
+
+                if (usernameSnapshot.exists()) {
+                    throw new Error("USERNAME_TAKEN");
                 }
 
+                transaction.set(usernameRef, {
+                    uid: user.uid
+                });
 
-                createBtn.disabled = false;
+                transaction.set(userRef, {
+                    displayName: displayName,
+                    username: username,
+                    createdAt: serverTimestamp()
+                });
+            });
 
-                createBtn.textContent =
-                    "Create Account";
+            alert("Your account was created successfully!");
 
+            window.location.href = "index.html";
+
+        } catch (error) {
+
+            if (error.message === "USERNAME_TAKEN") {
+
+                // Username was already taken.
+                // Remove the newly created Auth account so
+                // the user can try again with another username.
+                try {
+                    if (auth.currentUser) {
+                        await deleteUser(auth.currentUser);
+                    }
+                } catch (deleteError) {
+                    console.error(deleteError);
+                }
+
+                alert("That username is already taken. Please choose another.");
+
+            } else {
+                console.error(error);
+
+                alert("Account creation failed. Please try again.");
             }
-
-        });
-
-    </script>
+        }
+    });
+    
+</script>
 
 </body>
 </html>
