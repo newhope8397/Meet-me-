@@ -23,6 +23,12 @@ service cloud.firestore {
 
       allow update, delete: if request.auth != null
                             && resource.data.uid == request.auth.uid;
-    }
+   match /featureFeedback/{feedbackId} {
+  allow create: if request.auth != null
+                && request.resource.data.uid == request.auth.uid;
+
+  allow read: if false;
+}
+}
   }
 }
