@@ -465,70 +465,8 @@
 
         createBtn.addEventListener("click", async () => {
 
-            const email =
-                document.getElementById("email")
-                .value
-                .trim();
 
-
-            const displayName =
-                document.getElementById("displayName")
-                .value
-                .trim();
-
-
-            const username =
-                usernameInput.value.trim();
-
-
-            const password =
-                passwordInput.value;
-
-
-            if (!email) {
-
-                alert("Please enter your email address.");
-
-                return;
-            }
-
-
-            if (!displayName) {
-
-                alert("Please enter your display name.");
-
-                return;
-            }
-
-
-            if (!username) {
-
-                alert("Please choose a username.");
-
-                return;
-            }
-
-
-            if (username.length < 3) {
-
-                alert("Username must be at least 3 characters long.");
-
-                return;
-            }
-
-
-            if (!password) {
-
-                alert("Please create a password.");
-
-                return;
-            }
-
-
-            if (password.length < 8) {
-
-                alert("Password must be at least 8 characters long.");
-<!-- Firebase -->
+     <!-- Firebase -->
 
 <script type="module">
 
