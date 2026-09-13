@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Change Avatar - Meet Me</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
+            background:
+                radial-gradient(circle at top left, #512da8, transparent 35%),
+                radial-gradient(circle at bottom right, #006064, transparent 35%),
+                #0b0b12;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 430px;
+            margin: auto;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .back-button {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: white;
+            background: rgba(255, 255, 255, 0.12);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        h1 {
+            font-size: 25px;
+            margin: 0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 24px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .preview {
+            width: 130px;
+            height: 130px;
+            margin: 5px auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 70px;
+            border: 4px solid rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+
+        .emoji-grid,
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .emoji-button,
+        .color-button {
+            border: 2px solid transparent;
+            border-radius: 14px;
+            min-height: 48px;
+            cursor: pointer;
+        }
+
+        .emoji-button {
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 25px;
+        }
+
+        .emoji-button.selected,
+        .color-button.selected {
+            border-color: white;
+            transform: scale(1.04);
+        }
+
+        .color-button {
+            height: 48px;
+        }
+
+        .violet {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+        }
+
+        .cyan {
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
+        }
+
+        .blue {
+            background: linear-gradient(135deg, #2563eb, #60a5fa);
+        }
+
+        .green {
+            background: linear-gradient(135deg, #059669, #34d399);
+        }
+
+        .pink {
+            background: linear-gradient(135deg, #db2777, #f472b6);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d8d8e5;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 13px;
+            outline: none;
+            color: white;
+            background: rgba(0, 0, 0, 0.25);
+            font-size: 20px;
+        }
+
+        input:focus {
+            border-color: #a78bfa;
+        }
+
+        .save-button {
+            width: 100%;
+            margin-top: 28px;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .save-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            min-height: 20px;
+            margin-top: 15px;
+            text-align: center;
+            color: #c4b5fd;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <div class="topbar">
+            <button class="back-button" id="backButton">←</button>
+            <h1>Change Avatar</h1>
+        </div>
+
+        <section class="card">
+
+            <div class="preview" id="avatarPreview">🙂</div>
+
+            <h2>Choose an avatar</h2>
+
+            <div class="emoji-grid">
+                <button class="emoji-button selected" data-emoji="🙂">🙂</button>
+                <button class="emoji-button" data-emoji="😎">😎</button>
+                <button class="emoji-button" data-emoji="😄">😄</button>
+                <button class="emoji-button" data-emoji="🤓">🤓</button>
+                <button class="emoji-button" data-emoji="😇">😇</button>
+                <button class="emoji-button" data-emoji="🦁">🦁</button>
+                <button class="emoji-button" data-emoji="🐼">🐼</button>
+                <button class="emoji-button" data-emoji="🐯">🐯</button>
+                <button class="emoji-button" data-emoji="🚀">🚀</button>
+                <button class="emoji-button" data-emoji="⭐">⭐</button>
+                <button class="emoji-button" data-emoji="🔥">🔥</button>
+                <button class="emoji-button" data-emoji="🎯">🎯</button>
+                <button class="emoji-button" data-emoji="💡">💡</button>
+                <button class="emoji-button" data-emoji="👑">👑</button>
+                <button class="emoji-button" data-emoji="⚡">⚡</button>
+            </div>
+
+            <h2>Or enter your own emoji</h2>
+
+            <label for="customEmoji">Custom avatar emoji</label>
+            <input
+                id="customEmoji"
+                type="text"
+                inputmode="text"
+                maxlength="4"
+                placeholder="Enter an emoji"
+            >
+
+            <h2>Choose background</h2>
+
+            <div class="color-grid">
+                <button class="color-button violet selected"
+                        data-color="violet"
+                        aria-label="Violet background"></button>
+
+                <button class="color-button cyan"
+                        data-color="cyan"
+                        aria-label="Cyan background"></button>
+
+                <button class="color-button blue"
+                        data-color="blue"
+                        aria-label="Blue background"></button>
+
+                <button class="color-button green"
+                        data-color="green"
+                        aria-label="Green background"></button>
+
+                <button class="color-button pink"
+                        data-color="pink"
+                        aria-label="Pink background"></button>
+            </div>
+
+            <button class="save-button" id="saveButton">
+                Save Avatar
+            </button>
+
+            <div class="message" id="message"></div>
+
+        </section>
+
+    </main>
+
+    <script type="module">
+        import { app } from "./js/firebase.js";
+
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+        import {
+            getFirestore,
+            doc,
+            updateDoc
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const avatarPreview = document.getElementById("avatarPreview");
+        const customEmoji = document.getElementById("customEmoji");
+        const saveButton = document.getElementById("saveButton");
+        const message = document.getElementById("message");
+        const backButton = document.getElementById("backButton");
+
+        let selectedEmoji = "🙂";
+        let selectedColor = "violet";
+        let currentUser = null;
+
+        const colorClasses = [
+            "violet",
+            "cyan",
+            "blue",
+            "green",
+            "pink"
+        ];
+
+        function updatePreview() {
+            avatarPreview.textContent = selectedEmoji;
+
+            avatarPreview.classList.remove(...colorClasses);
+            avatarPreview.classList.add(selectedColor);
+        }
+
+        document.querySelectorAll(".emoji-button").forEach(button => {
+            button.addEventListener("click", () => {
+                selectedEmoji = button.dataset.emoji;
+                customEmoji.value = "";
+
+                document.querySelectorAll(".emoji-button").forEach(item => {
+                    item.classList.remove("selected");
+                });
+
+                button.classList.add("selected");
+
+                updatePreview();
+            });
+        });
+
+        customEmoji.addEventListener("input", () => {
+            const enteredEmoji = customEmoji.value.trim();
+
+            if (enteredEmoji.length > 0) {
+                selectedEmoji = enteredEmoji;
+
+                document.querySelectorAll(".emoji-button").forEach(item => {
+                    item.classList.remove("selected");
+                });
+
+                updatePreview();
+            }
+        });
+
+        document.querySelectorAll(".color-button").forEach(button => {
+            button.addEventListener("click", () => {
+                selectedColor = button.dataset.color;
+
+                document.querySelectorAll(".color-button").forEach(item => {
+                    item.classList.remove("selected");
+                });
+
+                button.classList.add("selected");
+
+                updatePreview();
+            });
+        });
+
+        backButton.addEventListener("click", () => {
+            window.location.href = "./home.html";
+        });
+
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                window.location.href = "./login.html";
+                return;
+            }
+
+            currentUser = user;
+        });
+
+        saveButton.addEventListener("click", async () => {
+            if (!currentUser) {
+                message.textContent = "Please log in first.";
+                return;
+            }
+
+            if (!selectedEmoji.trim()) {
+                message.textContent = "Please choose an avatar.";
+                return;
+            }
+
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+            message.textContent = "";
+
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+
+                await updateDoc(userRef, {
+                    avatar: selectedEmoji,
+                    avatarBackground: selectedColor
+                });
+
+                message.textContent = "Avatar saved successfully!";
+
+                setTimeout(() => {
+                    window.location.href = "./home.html";
+                }, 900);
+
+            } catch (error) {
+                console.error("Avatar save error:", error);
+
+                message.textContent =
+                    "Could not save avatar. Please try again.";
+
+                saveButton.disabled = false;
+                saveButton.textContent = "Save Avatar";
+            }
+        });
+
+        updatePreview();
+    </script>
+
+</body>
+</html>
