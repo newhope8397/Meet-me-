@@ -31,7 +31,6 @@
         .container {
             width: 100%;
             max-width: 420px;
-
             padding: 30px;
 
             background: rgba(255, 255, 255, 0.06);
@@ -60,7 +59,6 @@
             justify-content: center;
 
             margin-bottom: 20px;
-
             border-radius: 16px;
 
             background: linear-gradient(135deg, #7c5cff, #25d9ff);
@@ -98,7 +96,6 @@
 
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
-
             outline: none;
 
             background: rgba(0, 0, 0, 0.25);
@@ -137,7 +134,6 @@
 
             right: 10px;
             top: 50%;
-
             transform: translateY(-50%);
 
             border: none;
@@ -151,7 +147,6 @@
 
         .info {
             margin: 5px 0 22px;
-
             padding: 13px 14px;
 
             border-radius: 12px;
@@ -192,7 +187,6 @@
 
         .login-link {
             text-align: center;
-
             margin-top: 22px;
 
             color: #aeb6c7;
@@ -221,7 +215,6 @@
             Create your Meet Me identity without using a phone number.
         </p>
 
-
         <!-- Email -->
 
         <div class="input-box">
@@ -244,7 +237,6 @@
 
         </div>
 
-
         <!-- Display Name -->
 
         <div class="input-box">
@@ -263,7 +255,6 @@
             >
 
         </div>
-
 
         <!-- Username -->
 
@@ -293,7 +284,6 @@
             </p>
 
         </div>
-
 
         <!-- Password -->
 
@@ -326,20 +316,18 @@
 
         </div>
 
-
         <div class="info">
             Your phone number is not required. Your display name can
             be the same as someone else's, but your username must be
             unique.
         </div>
 
-
         <button
             class="create-btn"
-            id="createBtn">
+            id="createBtn"
+            type="button">
             Create Account
         </button>
-
 
         <p class="login-link">
             Already have an account?
@@ -347,7 +335,6 @@
         </p>
 
     </div>
-
 
     <!-- Firebase -->
 
@@ -357,11 +344,20 @@
 
         import {
             getAuth,
-            createUserWithEmailAndPassword
+            createUserWithEmailAndPassword,
+            deleteUser
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+        import {
+            getFirestore,
+            doc,
+            runTransaction,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
 
         /* =========================
@@ -418,7 +414,17 @@
         usernameInput.addEventListener("input", () => {
 
             let username =
-                usernameInput.value.trim().toLowerCase();
+                usernameInput.value
+                .trim()
+                .toLowerCase();
+
+
+            username =
+                username.replace(/^@/, "");
+
+
+            usernameInput.value =
+                username;
 
 
             if (username === "") {
@@ -429,28 +435,35 @@
             }
 
 
-            username =
-                username.replace(/^@/, "");
-
-
             if (!/^[a-z0-9._]+$/.test(username)) {
 
                 usernameStatus.textContent =
                     "Username can contain letters, numbers, dots and underscores.";
 
-                usernameStatus.style.color = "#ffb86b";
+                usernameStatus.style.color =
+                    "#ffb86b";
 
                 return;
             }
 
 
-            usernameInput.value = username;
+            if (username.length < 3) {
+
+                usernameStatus.textContent =
+                    "Username must be at least 3 characters.";
+
+                usernameStatus.style.color =
+                    "#ffb86b";
+
+                return;
+            }
 
 
             usernameStatus.textContent =
                 "Username format looks good.";
 
-            usernameStatus.style.color = "#9be7b0";
+            usernameStatus.style.color =
+                "#9be7b0";
 
         });
 
@@ -465,458 +478,316 @@
 
         createBtn.addEventListener("click", async () => {
 
+            const email =
+                document.getElementById("email")
+                .value
+                .trim();
 
-     <!-- Firebase -->
 
-<script type="module">
+            const displayName =
+                document.getElementById("displayName")
+                .value
+                .trim();
 
-    import { app } from "./js/firebase.js";
 
-    import {
-        getAuth,
-        createUserWithEmailAndPassword,
-        deleteUser
-    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+            let username =
+                usernameInput.value
+                .trim()
+                .toLowerCase();
 
-    import {
-        getFirestore,
-        doc,
-        runTransaction,
-        serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
+            username =
+                username.replace(/^@/, "");
 
-    const auth = getAuth(app);
-    const db = getFirestore(app);
 
-
-    /* =========================
-       PASSWORD SHOW / HIDE
-    ========================= */
-
-    const passwordInput =
-        document.getElementById("password");
-
-    const togglePassword =
-        document.getElementById("togglePassword");
-
-
-    togglePassword.addEventListener("click", () => {
-
-        if (passwordInput.type === "password") {
-
-            passwordInput.type = "text";
-
-            togglePassword.textContent = "🙈";
-
-            togglePassword.setAttribute(
-                "aria-label",
-                "Hide password"
-            );
-
-        } else {
-
-            passwordInput.type = "password";
-
-            togglePassword.textContent = "👁️";
-
-            togglePassword.setAttribute(
-                "aria-label",
-                "Show password"
-            );
-
-        }
-
-    });
-
-
-    /* =========================
-       USERNAME FORMAT CHECK
-    ========================= */
-
-    const usernameInput =
-        document.getElementById("username");
-
-    const usernameStatus =
-        document.getElementById("usernameStatus");
-
-
-    usernameInput.addEventListener("input", () => {
-
-        let username =
-            usernameInput.value.trim().toLowerCase();
-
-
-        if (username === "") {
-
-            usernameStatus.textContent = "";
-
-            return;
-        }
-
-
-        username =
-            username.replace(/^@/, "");
-
-
-        usernameInput.value = username;
-
-
-        if (!/^[a-z0-9._]+$/.test(username)) {
-
-            usernameStatus.textContent =
-                "Username can contain letters, numbers, dots and underscores.";
-
-            usernameStatus.style.color = "#ffb86b";
-
-            return;
-        }
-
-
-        if (username.length < 3) {
-
-            usernameStatus.textContent =
-                "Username must be at least 3 characters.";
-
-            usernameStatus.style.color = "#ffb86b";
-
-            return;
-        }
-
-
-        usernameStatus.textContent =
-            "Username format looks good.";
-
-        usernameStatus.style.color = "#9be7b0";
-
-    });
-
-
-    /* =========================
-       CREATE ACCOUNT
-    ========================= */
-
-    const createBtn =
-        document.getElementById("createBtn");
-
-
-    createBtn.addEventListener("click", async () => {
-
-        const email =
-            document.getElementById("email")
-            .value
-            .trim();
-
-
-        const displayName =
-            document.getElementById("displayName")
-            .value
-            .trim();
-
-
-        let username =
-            usernameInput.value
-            .trim()
-            .toLowerCase();
-
-
-        username =
-            username.replace(/^@/, "");
-
-
-        const password =
-            passwordInput.value;
-
-
-        /* =========================
-           BASIC VALIDATION
-        ========================= */
-
-        if (!email) {
-
-            alert("Please enter your email address.");
-
-            return;
-        }
-
-
-        if (!displayName) {
-
-            alert("Please enter your display name.");
-
-            return;
-        }
-
-
-        if (!username) {
-
-            alert("Please choose a username.");
-
-            return;
-        }
-
-
-        if (username.length < 3) {
-
-            alert(
-                "Username must be at least 3 characters long."
-            );
-
-            return;
-        }
-
-
-        if (!/^[a-z0-9._]+$/.test(username)) {
-
-            alert(
-                "Username can only contain letters, numbers, dots and underscores."
-            );
-
-            return;
-        }
-
-
-        if (!password) {
-
-            alert("Please create a password.");
-
-            return;
-        }
-
-
-        if (password.length < 8) {
-
-            alert(
-                "Password must be at least 8 characters long."
-            );
-
-            return;
-        }
-
-
-        /* =========================
-           DISABLE BUTTON
-        ========================= */
-
-        createBtn.disabled = true;
-
-        createBtn.textContent =
-            "Creating Account...";
-
-
-        try {
-
-            /* =========================
-               CREATE AUTH ACCOUNT
-            ========================= */
-
-            const userCredential =
-                await createUserWithEmailAndPassword(
-                    auth,
-                    email,
-                    password
-                );
-
-
-            const user =
-                userCredential.user;
-
-
-            console.log(
-                "Firebase user created:",
-                user.uid
-            );
+            const password =
+                passwordInput.value;
 
 
             /* =========================
-               SAVE USER + USERNAME
+               VALIDATION
             ========================= */
 
-            await runTransaction(
-                db,
-                async (transaction) => {
+            if (!email) {
 
-                    const usernameRef =
-                        doc(
-                            db,
-                            "usernames",
-                            username
-                        );
+                alert("Please enter your email address.");
+
+                return;
+            }
 
 
-                    const userRef =
-                        doc(
-                            db,
-                            "users",
-                            user.uid
-                        );
+            if (!displayName) {
+
+                alert("Please enter your display name.");
+
+                return;
+            }
 
 
-                    const usernameSnapshot =
-                        await transaction.get(
-                            usernameRef
-                        );
+            if (!username) {
+
+                alert("Please choose a username.");
+
+                return;
+            }
 
 
-                    /* Username already exists */
-
-                    if (usernameSnapshot.exists()) {
-
-                        throw new Error(
-                            "USERNAME_TAKEN"
-                        );
-                    }
-
-
-                    /* Reserve username */
-
-                    transaction.set(
-                        usernameRef,
-                        {
-                            uid: user.uid
-                        }
-                    );
-
-
-                    /* Create user profile */
-
-                    transaction.set(
-                        userRef,
-                        {
-                            displayName:
-                                displayName,
-
-                            username:
-                                username,
-
-                            createdAt:
-                                serverTimestamp()
-                        }
-                    );
-
-                }
-            );
-
-
-            /* =========================
-               SUCCESS
-            ========================= */
-
-            alert(
-                "Your account was created successfully!"
-            );
-
-
-            window.location.href =
-                "index.html";
-
-
-        } catch (error) {
-
-
-            /* =========================
-               USERNAME TAKEN
-            ========================= */
-
-            if (
-                error.message ===
-                "USERNAME_TAKEN"
-            ) {
-
-                try {
-
-                    if (auth.currentUser) {
-
-                        await deleteUser(
-                            auth.currentUser
-                        );
-
-                    }
-
-                } catch (deleteError) {
-
-                    console.error(
-                        "Account cleanup failed:",
-                        deleteError
-                    );
-
-                }
-
-
-                createBtn.disabled = false;
-
-                createBtn.textContent =
-                    "Create Account";
-
+            if (username.length < 3) {
 
                 alert(
-                    "That username is already taken. Please choose another."
+                    "Username must be at least 3 characters long."
                 );
 
+                return;
+            }
+
+
+            if (!/^[a-z0-9._]+$/.test(username)) {
+
+                alert(
+                    "Username can only contain letters, numbers, dots and underscores."
+                );
+
+                return;
+            }
+
+
+            if (!password) {
+
+                alert("Please create a password.");
+
+                return;
+            }
+
+
+            if (password.length < 8) {
+
+                alert(
+                    "Password must be at least 8 characters long."
+                );
 
                 return;
             }
 
 
             /* =========================
-               OTHER ERRORS
+               BUTTON LOADING
             ========================= */
 
-            console.error(
-                "Account creation error:",
-                error
-            );
-
-
-            createBtn.disabled = false;
+            createBtn.disabled =
+                true;
 
             createBtn.textContent =
-                "Create Account";
+                "Creating Account...";
 
 
-            if (
-                error.code ===
-                "auth/email-already-in-use"
-            ) {
+            try {
 
-                alert(
-                    "An account with this email already exists."
+                /* =========================
+                   CREATE AUTH ACCOUNT
+                ========================= */
+
+                const userCredential =
+                    await createUserWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+
+                const user =
+                    userCredential.user;
+
+
+                console.log(
+                    "Firebase user created:",
+                    user.uid
                 );
 
-            } else if (
-                error.code ===
-                "auth/invalid-email"
-            ) {
 
-                alert(
-                    "Please enter a valid email address."
+                /* =========================
+                   SAVE PROFILE + USERNAME
+                ========================= */
+
+                await runTransaction(
+                    db,
+                    async (transaction) => {
+
+                        const usernameRef =
+                            doc(
+                                db,
+                                "usernames",
+                                username
+                            );
+
+
+                        const userRef =
+                            doc(
+                                db,
+                                "users",
+                                user.uid
+                            );
+
+
+                        const usernameSnapshot =
+                            await transaction.get(
+                                usernameRef
+                            );
+
+
+                        if (
+                            usernameSnapshot.exists()
+                        ) {
+
+                            throw new Error(
+                                "USERNAME_TAKEN"
+                            );
+
+                        }
+
+
+                        transaction.set(
+                            usernameRef,
+                            {
+                                uid: user.uid
+                            }
+                        );
+
+
+                        transaction.set(
+                            userRef,
+                            {
+                                displayName:
+                                    displayName,
+
+                                username:
+                                    username,
+
+                                createdAt:
+                                    serverTimestamp()
+                            }
+                        );
+
+                    }
                 );
 
-            } else if (
-                error.code ===
-                "auth/weak-password"
-            ) {
+
+                /* =========================
+                   SUCCESS
+                ========================= */
 
                 alert(
-                    "Please choose a stronger password."
+                    "Your account was created successfully!"
                 );
 
-            } else {
 
-                alert(
-                    "Account creation failed. Please try again."
+                window.location.href =
+                    "index.html";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Account creation error:",
+                    error
                 );
+
+
+                /* =========================
+                   USERNAME TAKEN
+                ========================= */
+
+                if (
+                    error.message ===
+                    "USERNAME_TAKEN"
+                ) {
+
+                    try {
+
+                        if (auth.currentUser) {
+
+                            await deleteUser(
+                                auth.currentUser
+                            );
+
+                        }
+
+                    } catch (deleteError) {
+
+                        console.error(
+                            "Account cleanup failed:",
+                            deleteError
+                        );
+
+                    }
+
+
+                    createBtn.disabled =
+                        false;
+
+                    createBtn.textContent =
+                        "Create Account";
+
+
+                    alert(
+                        "That username is already taken. Please choose another."
+                    );
+
+                    return;
+                }
+
+
+                /* =========================
+                   OTHER ERRORS
+                ========================= */
+
+                createBtn.disabled =
+                    false;
+
+                createBtn.textContent =
+                    "Create Account";
+
+
+                if (
+                    error.code ===
+                    "auth/email-already-in-use"
+                ) {
+
+                    alert(
+                        "An account with this email already exists."
+                    );
+
+                } else if (
+                    error.code ===
+                    "auth/invalid-email"
+                ) {
+
+                    alert(
+                        "Please enter a valid email address."
+                    );
+
+                } else if (
+                    error.code ===
+                    "auth/weak-password"
+                ) {
+
+                    alert(
+                        "Please choose a stronger password."
+                    );
+
+                } else {
+
+                    alert(
+                        "Account creation failed. Please try again."
+                    );
+
+                }
 
             }
 
-        }
+        });
 
-    });
-
-</script>
-
-</body>
-</html>
+    </script>
 
 </body>
 </html>
