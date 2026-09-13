@@ -242,7 +242,9 @@
         displayNameElement.textContent = "Unable to load profile";
         usernameElement.textContent = "";
         connectButton.style.display = "none";
-        showMessage("Unable to load profile. Please try again.");
+        showMessage(
+        "Error: " + error.code + " — " + error.message
+    );
     }
         }
 
