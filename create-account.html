@@ -528,38 +528,10 @@
             if (password.length < 8) {
 
                 alert("Password must be at least 8 characters long.");
-
-                return;
-            }
-
-
-            createBtn.disabled = true;
-
-            createBtn.textContent =
-                "Creating Account...";
-
-
-            try {
-
-                const userCredential =
-                    await createUserWithEmailAndPassword(
-                        auth,
-                        email,
-                        password
-                    );
-
-
-                console.log(
-                    "Firebase user created:",
-                    userCredential.user.uid
-                );
-
-
-                alert(
-                    "Your account was created successfully!"
-                );
+<!-- Firebase -->
 
 <script type="module">
+
     import { app } from "./js/firebase.js";
 
     import {
@@ -575,97 +547,438 @@
         serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
+
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const form = document.getElementById("createAccountForm");
 
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    /* =========================
+       PASSWORD SHOW / HIDE
+    ========================= */
 
-        const email = document.getElementById("email").value.trim();
-        const displayName = document.getElementById("displayName").value.trim();
+    const passwordInput =
+        document.getElementById("password");
 
-        let username = document.getElementById("username").value.trim().toLowerCase();
-        username = username.replace(/^@/, "");
+    const togglePassword =
+        document.getElementById("togglePassword");
 
-        const password = document.getElementById("password").value;
 
-        if (!email || !displayName || !username || !password) {
-            alert("Please fill in all fields.");
+    togglePassword.addEventListener("click", () => {
+
+        if (passwordInput.type === "password") {
+
+            passwordInput.type = "text";
+
+            togglePassword.textContent = "🙈";
+
+            togglePassword.setAttribute(
+                "aria-label",
+                "Hide password"
+            );
+
+        } else {
+
+            passwordInput.type = "password";
+
+            togglePassword.textContent = "👁️";
+
+            togglePassword.setAttribute(
+                "aria-label",
+                "Show password"
+            );
+
+        }
+
+    });
+
+
+    /* =========================
+       USERNAME FORMAT CHECK
+    ========================= */
+
+    const usernameInput =
+        document.getElementById("username");
+
+    const usernameStatus =
+        document.getElementById("usernameStatus");
+
+
+    usernameInput.addEventListener("input", () => {
+
+        let username =
+            usernameInput.value.trim().toLowerCase();
+
+
+        if (username === "") {
+
+            usernameStatus.textContent = "";
+
             return;
         }
+
+
+        username =
+            username.replace(/^@/, "");
+
+
+        usernameInput.value = username;
+
 
         if (!/^[a-z0-9._]+$/.test(username)) {
-            alert("Username can only contain letters, numbers, dots and underscores.");
+
+            usernameStatus.textContent =
+                "Username can contain letters, numbers, dots and underscores.";
+
+            usernameStatus.style.color = "#ffb86b";
+
             return;
         }
+
+
+        if (username.length < 3) {
+
+            usernameStatus.textContent =
+                "Username must be at least 3 characters.";
+
+            usernameStatus.style.color = "#ffb86b";
+
+            return;
+        }
+
+
+        usernameStatus.textContent =
+            "Username format looks good.";
+
+        usernameStatus.style.color = "#9be7b0";
+
+    });
+
+
+    /* =========================
+       CREATE ACCOUNT
+    ========================= */
+
+    const createBtn =
+        document.getElementById("createBtn");
+
+
+    createBtn.addEventListener("click", async () => {
+
+        const email =
+            document.getElementById("email")
+            .value
+            .trim();
+
+
+        const displayName =
+            document.getElementById("displayName")
+            .value
+            .trim();
+
+
+        let username =
+            usernameInput.value
+            .trim()
+            .toLowerCase();
+
+
+        username =
+            username.replace(/^@/, "");
+
+
+        const password =
+            passwordInput.value;
+
+
+        /* =========================
+           BASIC VALIDATION
+        ========================= */
+
+        if (!email) {
+
+            alert("Please enter your email address.");
+
+            return;
+        }
+
+
+        if (!displayName) {
+
+            alert("Please enter your display name.");
+
+            return;
+        }
+
+
+        if (!username) {
+
+            alert("Please choose a username.");
+
+            return;
+        }
+
+
+        if (username.length < 3) {
+
+            alert(
+                "Username must be at least 3 characters long."
+            );
+
+            return;
+        }
+
+
+        if (!/^[a-z0-9._]+$/.test(username)) {
+
+            alert(
+                "Username can only contain letters, numbers, dots and underscores."
+            );
+
+            return;
+        }
+
+
+        if (!password) {
+
+            alert("Please create a password.");
+
+            return;
+        }
+
 
         if (password.length < 8) {
-            alert("Password must be at least 8 characters long.");
+
+            alert(
+                "Password must be at least 8 characters long."
+            );
+
             return;
         }
 
+
+        /* =========================
+           DISABLE BUTTON
+        ========================= */
+
+        createBtn.disabled = true;
+
+        createBtn.textContent =
+            "Creating Account...";
+
+
         try {
-            // Create Firebase Authentication account
+
+            /* =========================
+               CREATE AUTH ACCOUNT
+            ========================= */
+
             const userCredential =
-                await createUserWithEmailAndPassword(auth, email, password);
+                await createUserWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
 
-            const user = userCredential.user;
 
-            // Create the username and user profile atomically
-            await runTransaction(db, async (transaction) => {
-                const usernameRef = doc(db, "usernames", username);
-                const userRef = doc(db, "users", user.uid);
+            const user =
+                userCredential.user;
 
-                const usernameSnapshot =
-                    await transaction.get(usernameRef);
 
-                if (usernameSnapshot.exists()) {
-                    throw new Error("USERNAME_TAKEN");
+            console.log(
+                "Firebase user created:",
+                user.uid
+            );
+
+
+            /* =========================
+               SAVE USER + USERNAME
+            ========================= */
+
+            await runTransaction(
+                db,
+                async (transaction) => {
+
+                    const usernameRef =
+                        doc(
+                            db,
+                            "usernames",
+                            username
+                        );
+
+
+                    const userRef =
+                        doc(
+                            db,
+                            "users",
+                            user.uid
+                        );
+
+
+                    const usernameSnapshot =
+                        await transaction.get(
+                            usernameRef
+                        );
+
+
+                    /* Username already exists */
+
+                    if (usernameSnapshot.exists()) {
+
+                        throw new Error(
+                            "USERNAME_TAKEN"
+                        );
+                    }
+
+
+                    /* Reserve username */
+
+                    transaction.set(
+                        usernameRef,
+                        {
+                            uid: user.uid
+                        }
+                    );
+
+
+                    /* Create user profile */
+
+                    transaction.set(
+                        userRef,
+                        {
+                            displayName:
+                                displayName,
+
+                            username:
+                                username,
+
+                            createdAt:
+                                serverTimestamp()
+                        }
+                    );
+
                 }
+            );
 
-                transaction.set(usernameRef, {
-                    uid: user.uid
-                });
 
-                transaction.set(userRef, {
-                    displayName: displayName,
-                    username: username,
-                    createdAt: serverTimestamp()
-                });
-            });
+            /* =========================
+               SUCCESS
+            ========================= */
 
-            alert("Your account was created successfully!");
+            alert(
+                "Your account was created successfully!"
+            );
 
-            window.location.href = "index.html";
+
+            window.location.href =
+                "index.html";
+
 
         } catch (error) {
 
-            if (error.message === "USERNAME_TAKEN") {
 
-                // Username was already taken.
-                // Remove the newly created Auth account so
-                // the user can try again with another username.
+            /* =========================
+               USERNAME TAKEN
+            ========================= */
+
+            if (
+                error.message ===
+                "USERNAME_TAKEN"
+            ) {
+
                 try {
+
                     if (auth.currentUser) {
-                        await deleteUser(auth.currentUser);
+
+                        await deleteUser(
+                            auth.currentUser
+                        );
+
                     }
+
                 } catch (deleteError) {
-                    console.error(deleteError);
+
+                    console.error(
+                        "Account cleanup failed:",
+                        deleteError
+                    );
+
                 }
 
-                alert("That username is already taken. Please choose another.");
+
+                createBtn.disabled = false;
+
+                createBtn.textContent =
+                    "Create Account";
+
+
+                alert(
+                    "That username is already taken. Please choose another."
+                );
+
+
+                return;
+            }
+
+
+            /* =========================
+               OTHER ERRORS
+            ========================= */
+
+            console.error(
+                "Account creation error:",
+                error
+            );
+
+
+            createBtn.disabled = false;
+
+            createBtn.textContent =
+                "Create Account";
+
+
+            if (
+                error.code ===
+                "auth/email-already-in-use"
+            ) {
+
+                alert(
+                    "An account with this email already exists."
+                );
+
+            } else if (
+                error.code ===
+                "auth/invalid-email"
+            ) {
+
+                alert(
+                    "Please enter a valid email address."
+                );
+
+            } else if (
+                error.code ===
+                "auth/weak-password"
+            ) {
+
+                alert(
+                    "Please choose a stronger password."
+                );
 
             } else {
-                console.error(error);
 
-                alert("Account creation failed. Please try again.");
+                alert(
+                    "Account creation failed. Please try again."
+                );
+
             }
+
         }
+
     });
-    
+
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
