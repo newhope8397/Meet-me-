@@ -199,74 +199,54 @@
         }
 
         async function loadProfile() {
-            if (!requestedUsername) {
-                displayNameElement.textContent = "Profile not found";
-                usernameElement.textContent = "";
-                connectButton.style.display = "none";
-                showMessage("No username was provided in this link.");
-                return;
-            }
+    if (!requestedUsername) {
+        displayNameElement.textContent = "Profile not found";
+        usernameElement.textContent = "";
+        connectButton.style.display = "none";
+        showMessage("No username was provided in this link.");
+        return;
+    }
 
-            try {
-                const usersRef = collection(db, "users");
+    try {
+        const username = requestedUsername.toLowerCase();
 
-                const profileQuery = query(
-                    usersRef,
-                    where("username", "==", requestedUsername.toLowerCase())
-                );
+        const profileRef = doc(db, "users", username);
+        const profileResult = await getDoc(profileRef);
 
-                const result = await getDocs(profileQuery);
-
-                if (result.empty) {
-                    displayNameElement.textContent = "Profile not found";
-                    usernameElement.textContent = "";
-                    connectButton.style.display = "none";
-                    showMessage("This username does not exist.");
-                    return;
-                }
-
-                profileData = result.docs[0].data();
-
-                avatarElement.textContent = profileData.avatar || "🙂";
-                displayNameElement.textContent =
-                    profileData.displayName || "Meet Me User";
-
-                usernameElement.textContent =
-                    "@" + (profileData.username || requestedUsername);
-
-                applyAvatarBackground(
-                    profileData.avatarBackground || "violet"
-                );
-
-                document.title =
-                    `${profileData.displayName || "Profile"} - Meet Me`;
-
-            } catch (error) {
-                console.error("Profile loading error:", error);
-
-                displayNameElement.textContent = "Unable to load profile";
-                usernameElement.textContent = "";
-                connectButton.style.display = "none";
-                showMessage("Please check your internet connection.");
-            }
+        if (!profileResult.exists()) {
+            displayNameElement.textContent = "Profile not found";
+            usernameElement.textContent = "";
+            connectButton.style.display = "none";
+            showMessage("This username does not exist.");
+            return;
         }
 
-        connectButton.addEventListener("click", () => {
-            if (!profileData) {
-                showMessage("Profile is still loading.");
-                return;
-            }
+        profileData = profileResult.data();
 
-            showMessage(
-                "Connection requests will be added in the next step."
-            );
-        });
+        avatarElement.textContent = profileData.avatar || "🙂";
 
-        homeButton.addEventListener("click", () => {
-            window.location.href = "./index.html";
-        });
+        displayNameElement.textContent =
+            profileData.displayName || username;
 
-        loadProfile();
+        usernameElement.textContent =
+            "@" + (profileData.username || username);
+
+        applyAvatarBackground(
+            profileData.avatarBackground || "violet"
+        );
+
+        document.title =
+            `${profileData.displayName || username} - Meet Me`;
+
+    } catch (error) {
+        console.error("Profile loading error:", error);
+
+        displayNameElement.textContent = "Unable to load profile";
+        usernameElement.textContent = "";
+        connectButton.style.display = "none";
+        showMessage("Unable to load profile. Please try again.");
+    }
+        }
     </script>
 
 </body>
