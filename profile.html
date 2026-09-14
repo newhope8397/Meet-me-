@@ -160,12 +160,21 @@
         import { app } from "./js/firebase.js";
 
         import {
-            getFirestore,
-            doc,
-            getDoc
-        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+    getFirestore,
+    doc,
+    getDoc,
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
+        import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+        
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         const avatarElement = document.getElementById("avatar");
         const displayNameElement = document.getElementById("displayName");
@@ -182,10 +191,56 @@
         function showMessage(text) {
             message.textContent = text;
         }
-        connectButton.addEventListener("click", () => {
+        connectButton.addEventListener("click", async () => {
     if (!profileData) {
         showMessage("Profile is still loading. Please try again.");
         return;
+    }
+
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+        showMessage("Please log in before sending a connection request.");
+        return;
+    }
+
+    if (!profileData.uid) {
+        showMessage("This profile is missing its user ID.");
+        return;
+    }
+
+    if (currentUser.uid === profileData.uid) {
+        showMessage("You cannot send a request to yourself.");
+        return;
+    }
+
+    connectButton.disabled = true;
+    connectButton.textContent = "Sending...";
+
+    try {
+        await addDoc(collection(db, "connectionRequests"), {
+            senderUid: currentUser.uid,
+            receiverUid: profileData.uid,
+            receiverUsername: requestedUsername.toLowerCase(),
+            status: "pending",
+            createdAt: serverTimestamp()
+        });
+
+        connectButton.textContent = "Request sent";
+        showMessage("Connection request sent successfully.");
+
+    } catch (error) {
+        console.error("Connection request error:", error);
+
+        connectButton.disabled = false;
+        connectButton.textContent = "Connect";
+
+        showMessage(
+            "Unable to send request: " +
+            (error.code || "unknown")
+        );
+    }
+});
     }
 
     showMessage(
