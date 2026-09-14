@@ -208,10 +208,11 @@
     try {
         const username = requestedUsername.toLowerCase();
 
-        const profileRef = doc(db, "users", username);
-        const profileResult = await getDoc(profileRef);
+        // Step 1: Find the UID using the username
+        const usernameRef = doc(db, "usernames", username);
+        const usernameResult = await getDoc(usernameRef);
 
-        if (!profileResult.exists()) {
+        if (!usernameResult.exists()) {
             displayNameElement.textContent = "Profile not found";
             usernameElement.textContent = "";
             connectButton.style.display = "none";
@@ -219,7 +220,21 @@
             return;
         }
 
-        profileData = profileResult.data();
+        const usernameData = usernameResult.data();
+        const uid = usernameData.uid;
+
+        // Step 2: Load the actual user profile using the UID
+        const profileRef = doc(db, "users", uid);
+        const profileResult = await getDoc(profileRef);
+
+        if (!profileResult.exists()) {
+            // The username exists, but the public profile is incomplete
+            profileData = {
+                username: username
+            };
+        } else {
+            profileData = profileResult.data();
+        }
 
         avatarElement.textContent = profileData.avatar || "🙂";
 
@@ -242,9 +257,13 @@
         displayNameElement.textContent = "Unable to load profile";
         usernameElement.textContent = "";
         connectButton.style.display = "none";
+
         showMessage(
-        "Error: " + error.code + " — " + error.message
-    );
+            "Error: " +
+            (error.code || "unknown") +
+            " — " +
+            (error.message || error)
+        );
     }
         }
 
