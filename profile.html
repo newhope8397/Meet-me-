@@ -182,6 +182,20 @@
         function showMessage(text) {
             message.textContent = text;
         }
+        connectButton.addEventListener("click", () => {
+    if (!profileData) {
+        showMessage("Profile is still loading. Please try again.");
+        return;
+    }
+
+    showMessage(
+        "Connection requests will be available soon."
+    );
+});
+
+homeButton.addEventListener("click", () => {
+    window.location.href = "./index.html";
+});
 
         function applyAvatarBackground(backgroundName) {
             const backgrounds = {
