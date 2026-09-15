@@ -490,8 +490,12 @@
                 Connect with friends without sharing your number.
             </div> 
             <button id="requestsButton" class="requests-button">
-    🔔 Connection requests
-    <span id="requestCount" class="request-count hidden">0</span>
+         🔔 Connection requests
+         <span id="requestCount" class="request-count hidden">0</span>
+            </button>
+
+            <button id="connectionsButton" class="requests-button">
+            🤝 My connections
             </button>
 
 
@@ -515,8 +519,8 @@
 
             <div class="button-row">
                 <button id="chatButton" class="action-button primary-button">
-                    💬 Chat
-                    <small>Available later in the next step</small>
+        💬 Chat
+       <small>Open your conversations</small>
                 </button>
 
                 <button id="voiceButton" class="action-button">
@@ -677,10 +681,13 @@
         const qrButton =
             document.getElementById("qrButton");
         const requestsButton =
-    document.getElementById("requestsButton");
+           document.getElementById("requestsButton");
 
-     const requestCount =
-    document.getElementById("requestCount");
+        const requestCount =
+           document.getElementById("requestCount");
+
+        const connectionsButton =
+            document.getElementById("connectionsButton");
 
         const chatButton =
             document.getElementById("chatButton");
@@ -932,6 +939,9 @@ function listenForRequestNotifications(user) {
 
         requestsButton.addEventListener("click", () => {
     window.location.href = "requests.html";
+});
+        connectionsButton.addEventListener("click", () => {
+    window.location.href = "connections.html";
 });
 
         chatButton.addEventListener("click", () => {
