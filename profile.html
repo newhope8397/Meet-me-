@@ -273,6 +273,17 @@ homeButton.addEventListener("click", () => {
         // Step 1: Find the UID using the username
         const usernameRef = doc(db, "usernames", username);
         const usernameResult = await getDoc(usernameRef);
+if (!usernameResult.exists()) {
+    showMessage("User not found.");
+    return;
+}
+
+const uid = usernameResult.data().uid;
+
+if (!uid) {
+    showMessage("This username does not have a user ID.");
+    return;
+}
 
         if (!usernameResult.exists()) {
             displayNameElement.textContent = "Profile not found";
