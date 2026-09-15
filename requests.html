@@ -208,8 +208,10 @@
             where,
             onSnapshot,
             doc,
-            updateDoc,
-            deleteDoc
+            getDoc,
+            setDoc,
+            updateDoc
+        
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
         import {
@@ -341,53 +343,135 @@
             });
         }
 
-        async function respondToRequest(
-            requestId,
-            newStatus,
-            acceptButton,
-            rejectButton
-        ) {
-            acceptButton.disabled = true;
-            rejectButton.disabled = true;
+        
+async function respondToRequest(
+    requestId,
+    newStatus,
+    acceptButton,
+    rejectButton
+) {
+    acceptButton.disabled = true;
+    rejectButton.disabled = true;
 
-            acceptButton.textContent = "Please wait...";
+    acceptButton.textContent = "Please wait...";
 
-            try {
-                const requestRef = doc(
-                    db,
-                    "connectionRequests",
-                    requestId
-                );
+    try {
+        const requestRef = doc(
+            db,
+            "connectionRequests",
+            requestId
+        );
 
-                if (newStatus === "accepted") {
-                    await updateDoc(requestRef, {
-                        status: "accepted"
-                    });
+        // Reject request
+        if (newStatus === "rejected") {
+            await updateDoc(requestRef, {
+                status: "rejected"
+            });
 
-                    showMessage(
-                        "Request accepted. Chat will be added next."
-                    );
-                } else {
-                    await updateDoc(requestRef, {
-                        status: "rejected"
-                    });
-
-                    showMessage("Connection request rejected.");
-                }
-
-            } catch (error) {
-                console.error("Request response error:", error);
-
-                acceptButton.disabled = false;
-                rejectButton.disabled = false;
-                acceptButton.textContent = "Accept";
-
-                showMessage(
-                    "Unable to update request: " +
-                    (error.code || "unknown")
-                );
-            }
+            showMessage("Connection request rejected.");
+            return;
         }
+
+        // Accept request
+        const requestSnapshot = await getDoc(requestRef);
+
+        if (!requestSnapshot.exists()) {
+            throw new Error("Connection request no longer exists.");
+        }
+
+        const request = requestSnapshot.data();
+        const currentUser = auth.currentUser;
+
+        if (!currentUser) {
+            throw new Error("You are not logged in.");
+        }
+
+        // Load the receiver's profile
+        const receiverProfileSnapshot = await getDoc(
+            doc(db, "users", currentUser.uid)
+        );
+
+        const receiverProfile = receiverProfileSnapshot.exists()
+            ? receiverProfileSnapshot.data()
+            : {};
+
+        // Create a stable connection ID.
+        // Sorting keeps the same ID for both users.
+        const connectionId = [
+            request.senderUid,
+            currentUser.uid
+        ].sort().join("_");
+
+        // Save both users' public profile information
+        await setDoc(
+            doc(db, "connections", connectionId),
+            {
+                members: [
+                    request.senderUid,
+                    currentUser.uid
+                ],
+
+                users: [
+                    {
+                        uid: request.senderUid,
+                        displayName:
+                            request.senderDisplayName ||
+                            "Meet Me user",
+                        username:
+                            request.senderUsername ||
+                            "Username unavailable",
+                        avatar:
+                            request.senderAvatar ||
+                            "🙂",
+                        avatarBackground:
+                            request.senderAvatarBackground ||
+                            "violet"
+                    },
+                    {
+                        uid: currentUser.uid,
+                        displayName:
+                            receiverProfile.displayName ||
+                            currentUser.displayName ||
+                            "Meet Me user",
+                        username:
+                            receiverProfile.username ||
+                            "Username unavailable",
+                        avatar:
+                            receiverProfile.avatar ||
+                            "🙂",
+                        avatarBackground:
+                            receiverProfile.avatarBackground ||
+                            "violet"
+                    }
+                ],
+
+                createdAt: serverTimestamp()
+            }
+        );
+
+        // Update the request after the connection is created
+        await updateDoc(requestRef, {
+            status: "accepted"
+        });
+
+        showMessage(
+            "Connection accepted successfully."
+        );
+
+    } catch (error) {
+        console.error("Request response error:", error);
+
+        acceptButton.disabled = false;
+        rejectButton.disabled = false;
+        acceptButton.textContent = "Accept";
+
+        showMessage(
+            "Unable to update request: " +
+            (error.code || error.message || "unknown")
+        );
+    }
+}
+
 
         function listenForRequests(user) {
             if (unsubscribeRequests) {
