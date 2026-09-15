@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Connections - Meet Me</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 18px;
+            font-family: Arial, sans-serif;
+            color: white;
+            background:
+                radial-gradient(circle at top left, #43206b, transparent 42%),
+                radial-gradient(circle at bottom right, #063d52, transparent 38%),
+                #0b0b12;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 720px;
+            margin: auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .back-button {
+            padding: 11px 14px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .brand {
+            flex: 1;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .brand p {
+            margin: 5px 0 0;
+            color: #bdb8cc;
+            font-size: 13px;
+        }
+
+        .card {
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.075);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.22);
+        }
+
+        .connection-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .connection-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 17px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .avatar {
+            width: 58px;
+            height: 58px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            font-size: 30px;
+        }
+
+        .violet {
+            background: linear-gradient(135deg, #7c3aed, #c084fc);
+        }
+
+        .cyan {
+            background: linear-gradient(135deg, #0891b2, #67e8f9);
+        }
+
+        .blue {
+            background: linear-gradient(135deg, #2563eb, #93c5fd);
+        }
+
+        .green {
+            background: linear-gradient(135deg, #15803d, #86efac);
+        }
+
+        .connection-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .connection-info h3 {
+            margin: 0;
+            font-size: 17px;
+            overflow-wrap: anywhere;
+        }
+
+        .connection-info p {
+            margin: 5px 0 0;
+            color: #c4b5fd;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .chat-button {
+            padding: 11px 13px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .empty-message {
+            padding: 30px 12px;
+            color: #c4bfd2;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .status-message {
+            min-height: 20px;
+            margin-top: 15px;
+            color: #c4b5fd;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 14px;
+            }
+
+            .card {
+                padding: 14px;
+            }
+
+            .connection-item {
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .connection-info {
+                padding-top: 3px;
+            }
+
+            .chat-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="app">
+
+        <header>
+            <button id="backButton" class="back-button">
+                ← Back
+            </button>
+
+            <div class="brand">
+                <h1>My connections</h1>
+                <p>People you have connected with</p>
+            </div>
+        </header>
+
+        <section class="card">
+            <div id="connectionList" class="connection-list">
+                <p class="empty-message">
+                    Loading your connections...
+                </p>
+            </div>
+
+            <p id="statusMessage" class="status-message"></p>
+        </section>
+
+    </main>
+
+    <script type="module">
+        import { app } from "./js/firebase.js";
+
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+        import {
+            getFirestore,
+            collection,
+            query,
+            where,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const backButton =
+            document.getElementById("backButton");
+
+        const connectionList =
+            document.getElementById("connectionList");
+
+        const statusMessage =
+            document.getElementById("statusMessage");
+
+        let currentUser = null;
+        let unsubscribeConnections = null;
+
+        backButton.addEventListener("click", () => {
+            window.location.href = "home.html";
+        });
+
+        function showStatus(message) {
+            statusMessage.textContent = message;
+        }
+
+        function createConnectionCard(connection, otherUser) {
+            const item = document.createElement("div");
+            item.className = "connection-item";
+
+            const avatar = document.createElement("div");
+            avatar.className =
+                `avatar ${otherUser.avatarBackground || "violet"}`;
+            avatar.textContent = otherUser.avatar || "🪐";
+
+            const info = document.createElement("div");
+            info.className = "connection-info";
+
+            const name = document.createElement("h3");
+            name.textContent =
+                otherUser.displayName || "Meet Me user";
+
+            const username = document.createElement("p");
+            username.textContent =
+                otherUser.username
+                    ? `@${otherUser.username}`
+                    : "Username unavailable";
+
+            const chatButton = document.createElement("button");
+            chatButton.className = "chat-button";
+            chatButton.textContent = "💬 Chat";
+
+            chatButton.addEventListener("click", () => {
+                const connectionId = connection.id;
+
+                window.location.href =
+                    `chat.html?connection=${encodeURIComponent(
+                        connectionId
+                    )}`;
+            });
+
+            info.appendChild(name);
+            info.appendChild(username);
+
+            item.appendChild(avatar);
+            item.appendChild(info);
+            item.appendChild(chatButton);
+
+            return item;
+        }
+
+        function listenForConnections(user) {
+            if (unsubscribeConnections) {
+                unsubscribeConnections();
+            }
+
+            const connectionsQuery = query(
+                collection(db, "connections"),
+                where("members", "array-contains", user.uid)
+            );
+
+            unsubscribeConnections = onSnapshot(
+                connectionsQuery,
+                snapshot => {
+                    connectionList.innerHTML = "";
+
+                    if (snapshot.empty) {
+                        connectionList.innerHTML = `
+                            <p class="empty-message">
+                                You have no connections yet.<br>
+                                Accept a request to start connecting.
+                            </p>
+                        `;
+                        return;
+                    }
+
+                    snapshot.forEach(connectionSnapshot => {
+                        const connection =
+                            connectionSnapshot.data();
+
+                        const otherUser =
+                            connection.users?.find(
+                                member =>
+                                    member.uid !== user.uid
+                            );
+
+                        if (!otherUser) {
+                            return;
+                        }
+
+                        const card =
+                            createConnectionCard(
+                                {
+                                    id: connectionSnapshot.id
+                                },
+                                otherUser
+                            );
+
+                        connectionList.appendChild(card);
+                    });
+                },
+                error => {
+                    console.error(
+                        "Connection loading error:",
+                        error
+                    );
+
+                    connectionList.innerHTML = `
+                        <p class="empty-message">
+                            Could not load your connections.
+                            Please refresh the page.
+                        </p>
+                    `;
+
+                    showStatus(
+                        "Check your Firestore rules and try again."
+                    );
+                }
+            );
+        }
+
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            currentUser = user;
+            listenForConnections(user);
+        });
+    </script>
+</body>
+</html>
