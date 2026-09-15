@@ -191,6 +191,8 @@
             message.textContent = text;
         }
 connectButton.addEventListener("click", async () => {
+
+connectButton.addEventListener("click", async () => {
     if (!profileData) {
         showMessage("Profile is still loading. Please try again.");
         return;
@@ -216,36 +218,47 @@ connectButton.addEventListener("click", async () => {
     connectButton.disabled = true;
     connectButton.textContent = "Sending...";
 
-    const senderProfileSnap = await getDoc(
-    doc(db, "users", currentUser.uid)
-);
+    try {
+        // Load the sender's own profile
+        const senderProfileSnap = await getDoc(
+            doc(db, "users", currentUser.uid)
+        );
 
-const senderProfileData = senderProfileSnap.exists()
-    ? senderProfileSnap.data()
-    : {};
+        const senderProfileData = senderProfileSnap.exists()
+            ? senderProfileSnap.data()
+            : {};
 
-await addDoc(collection(db, "connectionRequests"), {
-    senderUid: currentUser.uid,
+        // Create the connection request
+        await addDoc(collection(db, "connectionRequests"), {
+            senderUid: currentUser.uid,
 
-    senderDisplayName:
-        senderProfileData.displayName ||
-        currentUser.displayName ||
-        "Meet Me user",
+            senderDisplayName:
+                senderProfileData.displayName ||
+                currentUser.displayName ||
+                "Meet Me user",
 
-    senderUsername:
-        senderProfileData.username ||
-        "Username unavailable",
+            senderUsername:
+                senderProfileData.username ||
+                "Username unavailable",
 
-    senderAvatar:
-        senderProfileData.avatar ||
-        "🙂",
+            senderAvatar:
+                senderProfileData.avatar ||
+                "🙂",
 
-    receiverUid: profileData.uid,
-    receiverUsername: requestedUsername.toLowerCase(),
+            senderAvatarBackground:
+                senderProfileData.avatarBackground ||
+                "violet",
 
-    status: "pending",
-    createdAt: serverTimestamp()
-});
+            receiverUid: profileData.uid,
+
+            receiverUsername:
+                profileData.username ||
+                requestedUsername.toLowerCase(),
+
+            status: "pending",
+
+            createdAt: serverTimestamp()
+        });
 
         connectButton.textContent = "Request sent";
         showMessage("Connection request sent successfully.");
@@ -262,6 +275,7 @@ await addDoc(collection(db, "connectionRequests"), {
         );
     }
 });
+
 
 homeButton.addEventListener("click", () => {
     window.location.href = "./index.html";
