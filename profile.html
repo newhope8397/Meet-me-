@@ -218,12 +218,18 @@ connectButton.addEventListener("click", async () => {
 
     try {
         await addDoc(collection(db, "connectionRequests"), {
-            senderUid: currentUser.uid,
-            receiverUid: profileData.uid,
-            receiverUsername: requestedUsername.toLowerCase(),
-            status: "pending",
-            createdAt: serverTimestamp()
-        });
+    senderUid: currentUser.uid,
+
+    senderDisplayName: currentUser.displayName || "Meet Me user",
+    senderUsername: currentUserData.username || "Username unavailable",
+    senderAvatar: currentUserData.avatar || "🙂",
+
+    receiverUid: profileData.uid,
+    receiverUsername: requestedUsername.toLowerCase(),
+
+    status: "pending",
+    createdAt: serverTimestamp()
+});
 
         connectButton.textContent = "Request sent";
         showMessage("Connection request sent successfully.");
