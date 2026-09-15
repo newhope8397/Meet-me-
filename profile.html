@@ -258,7 +258,7 @@ homeButton.addEventListener("click", () => {
                 backgrounds[backgroundName] || backgrounds.violet;
         }
 
-        async function loadProfile() {
+async function loadProfile() {
     if (!requestedUsername) {
         displayNameElement.textContent = "Profile not found";
         usernameElement.textContent = "";
@@ -273,17 +273,6 @@ homeButton.addEventListener("click", () => {
         // Step 1: Find the UID using the username
         const usernameRef = doc(db, "usernames", username);
         const usernameResult = await getDoc(usernameRef);
-if (!usernameResult.exists()) {
-    showMessage("User not found.");
-    return;
-}
-
-const uid = usernameResult.data().uid;
-
-if (!uid) {
-    showMessage("This username does not have a user ID.");
-    return;
-}
 
         if (!usernameResult.exists()) {
             displayNameElement.textContent = "Profile not found";
@@ -296,22 +285,35 @@ if (!uid) {
         const usernameData = usernameResult.data();
         const uid = usernameData.uid;
 
+        if (!uid) {
+            displayNameElement.textContent = "Profile unavailable";
+            usernameElement.textContent = "";
+            connectButton.style.display = "none";
+            showMessage("This username does not have a user ID.");
+            return;
+        }
+
         // Step 2: Load the actual user profile using the UID
         const profileRef = doc(db, "users", uid);
         const profileResult = await getDoc(profileRef);
 
         if (!profileResult.exists()) {
-    profileData = {
-        uid: uid,
-        username: username
-    };
-} else {
-    profileData = {
-        ...profileResult.data(),
-        uid: profileResult.data().uid || uid,
-        username: profileResult.data().username || username
-    };
+            profileData = {
+                uid: uid,
+                username: username
+            };
+        } else {
+            const data = profileResult.data();
+
+            profileData = {
+                ...data,
+                uid: uid,
+                username: data.username || username
+            };
         }
+
+        console.log("Loaded profile data:", profileData);
+        console.log("Loaded profile UID:", profileData.uid);
 
         avatarElement.textContent = profileData.avatar || "🙂";
 
@@ -342,7 +344,8 @@ if (!uid) {
             (error.message || error)
         );
     }
-        }
+}
+
 
         loadProfile();
     </script>
