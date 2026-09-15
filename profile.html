@@ -295,7 +295,11 @@ homeButton.addEventListener("click", () => {
         username: username
     };
 } else {
-    profileData = profileResult.data();
+    profileData = {
+        ...profileResult.data(),
+        uid: profileResult.data().uid || uid,
+        username: profileResult.data().username || username
+    };
         }
 
         avatarElement.textContent = profileData.avatar || "🙂";
