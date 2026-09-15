@@ -216,13 +216,29 @@ connectButton.addEventListener("click", async () => {
     connectButton.disabled = true;
     connectButton.textContent = "Sending...";
 
-    try {
-        await addDoc(collection(db, "connectionRequests"), {
+    const senderProfileSnap = await getDoc(
+    doc(db, "users", currentUser.uid)
+);
+
+const senderProfileData = senderProfileSnap.exists()
+    ? senderProfileSnap.data()
+    : {};
+
+await addDoc(collection(db, "connectionRequests"), {
     senderUid: currentUser.uid,
 
-    senderDisplayName: currentUser.displayName || "Meet Me user",
-    senderUsername: currentUserData.username || "Username unavailable",
-    senderAvatar: currentUserData.avatar || "🙂",
+    senderDisplayName:
+        senderProfileData.displayName ||
+        currentUser.displayName ||
+        "Meet Me user",
+
+    senderUsername:
+        senderProfileData.username ||
+        "Username unavailable",
+
+    senderAvatar:
+        senderProfileData.avatar ||
+        "🙂",
 
     receiverUid: profileData.uid,
     receiverUsername: requestedUsername.toLowerCase(),
