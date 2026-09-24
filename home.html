@@ -23,6 +23,29 @@
                 #0b0b12;
         }
 
+        button,
+        input,
+        textarea {
+            font-family: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            transition: 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid #f0abfc;
+            outline-offset: 3px;
+        }
+
         .app {
             width: 100%;
             max-width: 720px;
@@ -67,27 +90,13 @@
             font-size: 12px;
         }
 
-        button {
-            cursor: pointer;
-            border: none;
-            transition: 0.2s ease;
-        }
-
-        button:hover {
-            transform: translateY(-1px);
-        }
-
-        button:focus-visible,
-        input:focus-visible {
-            outline: 3px solid #f0abfc;
-            outline-offset: 3px;
-        }
-
-        .logout {
-            padding: 10px 14px;
-            border-radius: 12px;
+        .menu-button {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
             color: white;
             background: rgba(255, 255, 255, 0.1);
+            font-size: 24px;
         }
 
         .welcome h2 {
@@ -144,6 +153,14 @@
             background: linear-gradient(135deg, #15803d, #86efac);
         }
 
+        .pink {
+            background: linear-gradient(135deg, #db2777, #f9a8d4);
+        }
+
+        .orange {
+            background: linear-gradient(135deg, #ea580c, #fdba74);
+        }
+
         .profile-info {
             min-width: 0;
         }
@@ -167,6 +184,16 @@
             overflow-wrap: anywhere;
         }
 
+        .guest-label {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 5px 9px;
+            border-radius: 9px;
+            color: #ddd6fe;
+            background: rgba(124, 58, 237, 0.22);
+            font-size: 11px;
+        }
+
         .main-feature {
             margin-top: 22px;
             padding: 16px;
@@ -181,9 +208,39 @@
             font-weight: bold;
         }
 
+        .requests-button {
+            position: relative;
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .request-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 25px;
+            height: 25px;
+            margin-left: 7px;
+            padding: 0 7px;
+            border-radius: 50%;
+            color: white;
+            background: #ef4444;
+            font-size: 12px;
+        }
+
+        .request-count.hidden {
+            display: none;
+        }
+
         .button-row {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-top: 18px;
         }
@@ -292,6 +349,260 @@
             font-size: 13px;
         }
 
+        /* Menu */
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+        }
+
+        .menu-overlay.visible {
+            display: block;
+        }
+
+        .side-menu {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: min(360px, 88vw);
+            height: 100%;
+            padding: 24px 18px;
+            overflow-y: auto;
+            border-left: 1px solid rgba(255, 255, 255, 0.12);
+            background:
+                radial-gradient(circle at top right, #43206b, transparent 38%),
+                #101019;
+            box-shadow: -20px 0 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+
+        .menu-header h2 {
+            margin: 0;
+        }
+
+        .close-menu {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 20px;
+        }
+
+        .menu-profile {
+            padding: 15px;
+            margin-bottom: 18px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .menu-profile-name {
+            font-weight: bold;
+        }
+
+        .menu-profile-username {
+            margin-top: 5px;
+            color: #c4b5fd;
+            font-size: 13px;
+        }
+
+        .menu-section-title {
+            margin: 20px 8px 8px;
+            color: #8f899d;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            margin-top: 7px;
+            border-radius: 13px;
+            color: white;
+            background: rgba(255, 255, 255, 0.06);
+            text-align: left;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        .menu-item .menu-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 19px;
+        }
+
+        .menu-item span:last-child {
+            flex: 1;
+        }
+
+        .menu-item.danger {
+            color: #fecaca;
+        }
+
+        .menu-item.protect {
+            background: linear-gradient(
+                135deg,
+                rgba(124, 58, 237, 0.28),
+                rgba(6, 182, 212, 0.18)
+            );
+        }
+
+        /* Edit profile */
+
+        .edit-panel {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            border-radius: 20px;
+            background: rgba(124, 58, 237, 0.12);
+        }
+
+        .edit-panel.visible {
+            display: block;
+        }
+
+        .edit-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .edit-header h3 {
+            margin: 0;
+        }
+
+        .close-edit {
+            padding: 8px 10px;
+            border-radius: 10px;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .edit-avatar-preview {
+            width: 84px;
+            height: 84px;
+            margin: 18px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            font-size: 43px;
+        }
+
+        .edit-label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 7px;
+            color: #ddd6fe;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            outline: none;
+            color: white;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .edit-input::placeholder {
+            color: #898394;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 7px;
+        }
+
+        .emoji-button {
+            padding: 9px 4px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            font-size: 22px;
+        }
+
+        .emoji-button.selected {
+            border-color: #c084fc;
+            background: rgba(124, 58, 237, 0.35);
+        }
+
+        .background-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .background-button {
+            height: 42px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+        }
+
+        .background-button.selected {
+            border-color: white;
+        }
+
+        .background-violet {
+            background: linear-gradient(135deg, #7c3aed, #c084fc);
+        }
+
+        .background-cyan {
+            background: linear-gradient(135deg, #0891b2, #67e8f9);
+        }
+
+        .background-blue {
+            background: linear-gradient(135deg, #2563eb, #93c5fd);
+        }
+
+        .background-green {
+            background: linear-gradient(135deg, #15803d, #86efac);
+        }
+
+        .background-pink {
+            background: linear-gradient(135deg, #db2777, #f9a8d4);
+        }
+
+        .background-orange {
+            background: linear-gradient(135deg, #ea580c, #fdba74);
+        }
+
+        .save-profile {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 13px;
+            color: white;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            font-weight: bold;
+        }
+
+        /* Feedback */
+
         .feedback-panel {
             display: none;
             margin-top: 20px;
@@ -340,7 +651,6 @@
             outline: none;
             color: white;
             background: rgba(0, 0, 0, 0.25);
-            font-family: inherit;
         }
 
         .feedback-send {
@@ -361,56 +671,13 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .empty-message {
-            color: #c4bfd2;
-            text-align: center;
-        }
-        .requests-button {
-    position: relative;
-    width: 100%;
-    margin-top: 18px;
-    padding: 14px;
-    border-radius: 14px;
-    color: white;
-    background: linear-gradient(135deg, #7c3aed, #06b6d4);
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.request-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 25px;
-    height: 25px;
-    margin-left: 7px;
-    padding: 0 7px;
-    border-radius: 50%;
-    color: white;
-    background: #ef4444;
-    font-size: 12px;
-}
-
-.request-count.hidden {
-    display: none;
-}
-
         @media (max-width: 560px) {
             body {
                 padding: 14px;
             }
 
-            header {
-                align-items: flex-start;
-            }
-
             .brand h1 {
                 font-size: 19px;
-            }
-
-            .logout {
-                padding: 9px 11px;
-                font-size: 12px;
             }
 
             .welcome h2 {
@@ -436,6 +703,10 @@
                 font-size: 20px;
             }
 
+            .button-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
             .feature-grid {
                 grid-template-columns: 1fr;
             }
@@ -444,645 +715,1880 @@
 </head>
 
 <body>
-    <main class="app">
 
-        <header>
-            <div class="brand">
-                <div class="logo">M</div>
+<main class="app">
 
-                <div>
-                    <h1>Meet Me</h1>
-                    <p>Meet • Connect • Talk • Learn</p>
-                </div>
-        
+    <header>
+        <div class="brand">
+            <div class="logo">M</div>
+
+            <div>
+                <h1>Meet Me</h1>
+                <p>Meet • Connect • Talk • Learn</p>
+            </div>
+        </div>
+
+        <button id="menuButton" class="menu-button" aria-label="Open menu">
+            ☰
+        </button>
+    </header>
+
+    <section class="welcome">
+        <h2 id="welcomeTitle">Welcome to Meet Me</h2>
+
+        <p>
+            Connect with friends without sharing your number.
+            Your profile can be shared through a link or QR code.
+        </p>
+    </section>
+
+    <section class="card">
+
+        <div class="profile-top">
+            <div id="avatarPreview" class="avatar violet">
+                🪐
             </div>
 
-            <button id="logoutButton" class="logout">
-                Log out
-            </button> 
-            
-        </header>
-
-        <section class="welcome">
-            <h2 id="welcomeTitle">Welcome to Meet Me</h2>
-
-            <p>
-                Connect with friends without sharing your number.
-                Your profile can be shared through a link or QR code.
-            </p>
-        </section>
-
-        <section class="card">
-
-            <div class="profile-top">
-                <div id="avatarPreview" class="avatar violet">
-                    🪐
-                </div>
-
-                <div class="profile-info">
-                    <h3 id="displayName">Loading...</h3>
-                    <div id="username" class="username">@loading</div>
-                    <div id="email" class="email">Loading email...</div>
+            <div class="profile-info">
+                <h3 id="displayName">Loading...</h3>
+                <div id="username" class="username">@loading</div>
+                <div id="email" class="email">Loading...</div>
+                <div id="guestLabel" class="guest-label" style="display:none;">
+                    Guest account
                 </div>
             </div>
+        </div>
 
-            <div class="main-feature">
-                Connect with friends without sharing your number.
-            </div> 
-            <button id="requestsButton" class="requests-button">
-         🔔 Connection requests
-         <span id="requestCount" class="request-count hidden">0</span>
-            </button>
+        <div class="main-feature">
+            Connect with friends without sharing your number.
+        </div>
 
-            <button id="connectionsButton" class="requests-button">
+        <button id="requestsButton" class="requests-button">
+            🔔 Connection requests
+            <span id="requestCount" class="request-count hidden">0</span>
+        </button>
+
+        <button id="connectionsButton" class="requests-button">
             🤝 My connections
+        </button>
+
+        <div class="button-row">
+
+            <button id="chatButton" class="action-button primary-button">
+                💬 Chat
+                <small>Open your conversations</small>
             </button>
 
+            <button id="voiceButton" class="action-button">
+                📞 Voice call
+                <small>Coming later</small>
+            </button>
 
-            <div class="button-row">
-                <button id="changeAvatarButton" class="action-button">
-                    🎨 Change avatar
-                </button>
+            <button id="videoButton" class="action-button">
+                🎥 Video call
+                <small>Coming later</small>
+            </button>
 
-                <button id="copyUsernameButton" class="action-button">
-                    📋 Copy username
-                </button>
+        </div>
 
-                <button id="shareProfileButton" class="action-button primary-button">
-                    🔗 Share profile
-                </button>
+        <!-- Edit Profile -->
 
-                <button id="qrButton" class="action-button">
-                    ▦ Show QR code
-                </button>
-            </div>
+        <div id="editPanel" class="edit-panel">
 
-            <div class="button-row">
-                <button id="chatButton" class="action-button primary-button">
-        💬 Chat
-       <small>Open your conversations</small>
-                </button>
+            <div class="edit-header">
+                <h3>✏️ Edit Profile</h3>
 
-                <button id="voiceButton" class="action-button">
-                    📞 Voice call
-                    <small>Coming later</small>
-                </button>
-
-                <button id="videoButton" class="action-button">
-                    🎥 Video call
-                    <small>Coming later</small>
-                </button>
-            </div>
-
-            <div id="feedbackPanel" class="feedback-panel">
-                <h3 id="feedbackTitle">Voice calls are coming later</h3>
-
-                <p id="feedbackDescription">
-                    This feature is currently unavailable.
-                    Would you like to use it through Meet Me?
-                </p>
-
-                <div class="feedback-options">
-                    <button class="feedback-option" data-response="yes">
-                        ✅ Yes, I want this
-                    </button>
-
-                    <button class="feedback-option" data-response="maybe">
-                        🤔 Maybe later
-                    </button>
-
-                    <button class="feedback-option" data-response="no">
-                        ❌ Not interested
-                    </button>
-                </div>
-
-                <textarea
-                    id="suggestionInput"
-                    placeholder="Write your suggestion..."
-                ></textarea>
-
-                <button id="sendFeedbackButton" class="feedback-send">
-                    Send feedback
-                </button>
-
-                <button id="closeFeedbackButton" class="close-feedback">
+                <button id="closeEditButton" class="close-edit">
                     Close
                 </button>
-
-                <p id="feedbackStatus" class="status-message"></p>
             </div>
 
-            <div class="status-box">
-                <h4>Online status visibility</h4>
-
-                <div class="status-options">
-                    <button
-                        id="showStatusButton"
-                        class="status-option selected"
-                    >
-                        <strong>👁 Show status</strong>
-                        <span>
-                            Friends can see whether you are online or offline.
-                        </span>
-                    </button>
-
-                    <button
-                        id="hideStatusButton"
-                        class="status-option"
-                    >
-                        <strong>🙈 Hide status</strong>
-                        <span>
-                            Friends cannot see whether you are online or offline.
-                        </span>
-                    </button>
-                </div>
-
-                <p id="statusMessage" class="status-message"></p>
+            <div
+                id="editAvatarPreview"
+                class="edit-avatar-preview violet"
+            >
+                🪐
             </div>
 
-        </section>
+            <label class="edit-label">
+                Display name
+            </label>
 
-        <h3 class="section-title">Your Meet Me space</h3>
+            <input
+                id="editDisplayName"
+                class="edit-input"
+                maxlength="40"
+                placeholder="Your display name"
+            >
 
-        <section class="feature-grid">
-            <div class="feature-card">
-                <div class="symbol">💬</div>
-                <h4>Messages</h4>
-                <p>Chat with people after connecting.</p>
+            <label class="edit-label">
+                Username
+            </label>
+
+            <input
+                id="editUsername"
+                class="edit-input"
+                maxlength="30"
+                placeholder="username"
+                autocomplete="off"
+            >
+
+            <label class="edit-label">
+                Choose avatar
+            </label>
+
+            <div class="emoji-grid">
+
+                <button class="emoji-button" data-emoji="🪐">🪐</button>
+                <button class="emoji-button" data-emoji="😎">😎</button>
+                <button class="emoji-button" data-emoji="🚀">🚀</button>
+                <button class="emoji-button" data-emoji="🦊">🦊</button>
+                <button class="emoji-button" data-emoji="🐼">🐼</button>
+                <button class="emoji-button" data-emoji="🐯">🐯</button>
+                <button class="emoji-button" data-emoji="🦁">🦁</button>
+                <button class="emoji-button" data-emoji="🐺">🐺</button>
+                <button class="emoji-button" data-emoji="🤖">🤖</button>
+                <button class="emoji-button" data-emoji="👽">👽</button>
+                <button class="emoji-button" data-emoji="🧑‍🚀">🧑‍🚀</button>
+                <button class="emoji-button" data-emoji="🧠">🧠</button>
+
             </div>
 
-            <div class="feature-card">
-                <div class="symbol">🔎</div>
-                <h4>Find people</h4>
-                <p>Discover people through usernames and shared links.</p>
+            <label class="edit-label">
+                Avatar background
+            </label>
+
+            <div class="background-grid">
+
+                <button
+                    class="background-button background-violet"
+                    data-background="violet"
+                    aria-label="Violet"
+                ></button>
+
+                <button
+                    class="background-button background-cyan"
+                    data-background="cyan"
+                    aria-label="Cyan"
+                ></button>
+
+                <button
+                    class="background-button background-blue"
+                    data-background="blue"
+                    aria-label="Blue"
+                ></button>
+
+                <button
+                    class="background-button background-green"
+                    data-background="green"
+                    aria-label="Green"
+                ></button>
+
+                <button
+                    class="background-button background-pink"
+                    data-background="pink"
+                    aria-label="Pink"
+                ></button>
+
+                <button
+                    class="background-button background-orange"
+                    data-background="orange"
+                    aria-label="Orange"
+                ></button>
+
             </div>
 
-            <div class="feature-card">
-                <div class="symbol">🤝</div>
-                <h4>Connections</h4>
-                <p>Manage your accepted friends and requests.</p>
+            <button id="saveProfileButton" class="save-profile">
+                Save profile
+            </button>
+
+            <p id="editStatus" class="status-message"></p>
+
+        </div>
+
+        <!-- Feedback -->
+
+        <div id="feedbackPanel" class="feedback-panel">
+
+            <h3 id="feedbackTitle">
+                Voice calls are coming later
+            </h3>
+
+            <p id="feedbackDescription">
+                This feature is currently unavailable.
+                Would you like to use it through Meet Me?
+            </p>
+
+            <div class="feedback-options">
+
+                <button class="feedback-option" data-response="yes">
+                    ✅ Yes, I want this
+                </button>
+
+                <button class="feedback-option" data-response="maybe">
+                    🤔 Maybe later
+                </button>
+
+                <button class="feedback-option" data-response="no">
+                    ❌ Not interested
+                </button>
+
             </div>
-        </section>
 
-    </main>
+            <textarea
+                id="suggestionInput"
+                placeholder="Write your suggestion..."
+            ></textarea>
 
-    <script type="module">
-        import { app } from "./js/firebase.js";
+            <button id="sendFeedbackButton" class="feedback-send">
+                Send feedback
+            </button>
 
-        import {
-            getAuth,
-            onAuthStateChanged,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+            <button id="closeFeedbackButton" class="close-feedback">
+                Close
+            </button>
 
-        import {
-            getFirestore,
-            doc,
-            getDoc,
-            updateDoc,
-            addDoc,
-            collection,
-            serverTimestamp,
-            query,
-            where,
-            onSnapshot
-        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+            <p id="feedbackStatus" class="status-message"></p>
 
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        </div>
 
-        const displayNameElement =
-            document.getElementById("displayName");
+        <!-- Online status -->
 
-        const usernameElement =
-            document.getElementById("username");
+        <div class="status-box">
 
-        const emailElement =
-            document.getElementById("email");
+            <h4>Online status visibility</h4>
 
-        const welcomeTitle =
-            document.getElementById("welcomeTitle");
+            <div class="status-options">
 
-        const avatarPreview =
-            document.getElementById("avatarPreview");
+                <button
+                    id="showStatusButton"
+                    class="status-option selected"
+                >
+                    <strong>👁 Show status</strong>
 
-        const logoutButton =
-            document.getElementById("logoutButton");
+                    <span>
+                        Friends can see whether you are online or offline.
+                    </span>
+                </button>
 
-        const changeAvatarButton =
-            document.getElementById("changeAvatarButton");
+                <button
+                    id="hideStatusButton"
+                    class="status-option"
+                >
+                    <strong>🙈 Hide status</strong>
 
-        const copyUsernameButton =
-            document.getElementById("copyUsernameButton");
+                    <span>
+                        Friends cannot see whether you are online or offline.
+                    </span>
+                </button>
 
-        const shareProfileButton =
-            document.getElementById("shareProfileButton");
+            </div>
 
-        const qrButton =
-            document.getElementById("qrButton");
-        const requestsButton =
-           document.getElementById("requestsButton");
+            <p id="statusMessage" class="status-message"></p>
 
-        const requestCount =
-           document.getElementById("requestCount");
+        </div>
 
-        const connectionsButton =
-            document.getElementById("connectionsButton");
+    </section>
 
-        const chatButton =
-            document.getElementById("chatButton");
+    <h3 class="section-title">
+        Your Meet Me space
+    </h3>
 
-        const voiceButton =
-            document.getElementById("voiceButton");
+    <section class="feature-grid">
 
-        const videoButton =
-            document.getElementById("videoButton");
+        <div class="feature-card">
+            <div class="symbol">💬</div>
+            <h4>Messages</h4>
+            <p>
+                Chat with people after connecting.
+            </p>
+        </div>
 
-        const feedbackPanel =
-            document.getElementById("feedbackPanel");
+        <div class="feature-card">
+            <div class="symbol">🔎</div>
+            <h4>Find people</h4>
+            <p>
+                Discover people through usernames and shared links.
+            </p>
+        </div>
 
-        const feedbackTitle =
-            document.getElementById("feedbackTitle");
+        <div class="feature-card">
+            <div class="symbol">🤝</div>
+            <h4>Connections</h4>
+            <p>
+                Manage your accepted friends and requests.
+            </p>
+        </div>
 
-        const feedbackDescription =
-            document.getElementById("feedbackDescription");
+    </section>
 
-        const suggestionInput =
-            document.getElementById("suggestionInput");
+</main>
 
-        const sendFeedbackButton =
-            document.getElementById("sendFeedbackButton");
 
-        const closeFeedbackButton =
-            document.getElementById("closeFeedbackButton");
+<!-- Three-line menu -->
 
-        const feedbackStatus =
-            document.getElementById("feedbackStatus");
+<div id="menuOverlay" class="menu-overlay">
 
-        const showStatusButton =
-            document.getElementById("showStatusButton");
+    <aside class="side-menu">
 
-        const hideStatusButton =
-            document.getElementById("hideStatusButton");
+        <div class="menu-header">
 
-        const statusMessage =
-            document.getElementById("statusMessage");
+            <h2>Meet Me</h2>
 
-        let currentUser = null;
-        let currentProfile = null;
-        let selectedFeature = "";
-        let selectedResponse = "";
+            <button id="closeMenuButton" class="close-menu">
+                ×
+            </button>
 
-        function showStatusMessage(message) {
-            statusMessage.textContent = message;
-        }
+        </div>
 
-        function showFeedbackMessage(message) {
-            feedbackStatus.textContent = message;
-        }
+        <div class="menu-profile">
 
-        function updateAvatar(avatar, background) {
-            avatarPreview.textContent = avatar || "🪐";
-            avatarPreview.className =
-                `avatar ${background || "violet"}`;
-        }
+            <div
+                id="menuProfileName"
+                class="menu-profile-name"
+            >
+                Loading...
+            </div>
 
-        function openFeedback(featureName) {
-            selectedFeature = featureName;
-            selectedResponse = "";
+            <div
+                id="menuProfileUsername"
+                class="menu-profile-username"
+            >
+                @loading
+            </div>
 
-            feedbackTitle.textContent =
-                `${featureName} are coming later`;
+        </div>
 
-            feedbackDescription.textContent =
-                `This feature is currently unavailable. ` +
-                `Would you like to use ${featureName.toLowerCase()} ` +
-                `through Meet Me?`;
+        <div class="menu-section-title">
+            Profile
+        </div>
 
-            suggestionInput.value = "";
-            showFeedbackMessage("");
-            feedbackPanel.classList.add("visible");
-        }
-        let unsubscribeRequests = null;
+        <button id="editProfileMenuButton" class="menu-item">
+            <span class="menu-icon">✏️</span>
+            <span>Edit profile</span>
+        </button>
 
-function listenForRequestNotifications(user) {
-    if (unsubscribeRequests) {
-        unsubscribeRequests();
+        <button id="shareMenuButton" class="menu-item">
+            <span class="menu-icon">🔗</span>
+            <span>Share profile</span>
+        </button>
+
+        <button id="copyUsernameMenuButton" class="menu-item">
+            <span class="menu-icon">📋</span>
+            <span>Copy username</span>
+        </button>
+
+        <button id="qrMenuButton" class="menu-item">
+            <span class="menu-icon">▦</span>
+            <span>Show QR code</span>
+        </button>
+
+        <div class="menu-section-title">
+            Connections
+        </div>
+
+        <button id="menuConnectionsButton" class="menu-item">
+            <span class="menu-icon">🤝</span>
+            <span>My connections</span>
+        </button>
+
+        <button id="menuRequestsButton" class="menu-item">
+            <span class="menu-icon">🔔</span>
+            <span>Connection requests</span>
+        </button>
+
+        <div class="menu-section-title">
+            Account
+        </div>
+
+        <button
+            id="protectGuestButton"
+            class="menu-item protect"
+            style="display:none;"
+        >
+            <span class="menu-icon">🛡️</span>
+            <span>Protect guest account</span>
+        </button>
+
+        <button id="settingsButton" class="menu-item">
+            <span class="menu-icon">⚙️</span>
+            <span>Settings</span>
+        </button>
+
+        <button id="logoutButton" class="menu-item danger">
+            <span class="menu-icon">🚪</span>
+            <span>Log out</span>
+        </button>
+
+    </aside>
+
+</div>
+
+
+<script type="module">
+
+    import { app } from "./js/firebase.js";
+
+    import {
+        getAuth,
+        onAuthStateChanged,
+        signOut
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+    import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+        deleteDoc,
+        updateDoc,
+        addDoc,
+        collection,
+        serverTimestamp,
+        query,
+        where,
+        onSnapshot,
+        runTransaction
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+
+    const displayNameElement =
+        document.getElementById("displayName");
+
+    const usernameElement =
+        document.getElementById("username");
+
+    const emailElement =
+        document.getElementById("email");
+
+    const welcomeTitle =
+        document.getElementById("welcomeTitle");
+
+    const avatarPreview =
+        document.getElementById("avatarPreview");
+
+    const guestLabel =
+        document.getElementById("guestLabel");
+
+
+    const menuButton =
+        document.getElementById("menuButton");
+
+    const menuOverlay =
+        document.getElementById("menuOverlay");
+
+    const closeMenuButton =
+        document.getElementById("closeMenuButton");
+
+
+    const menuProfileName =
+        document.getElementById("menuProfileName");
+
+    const menuProfileUsername =
+        document.getElementById("menuProfileUsername");
+
+
+    const editPanel =
+        document.getElementById("editPanel");
+
+    const editProfileMenuButton =
+        document.getElementById("editProfileMenuButton");
+
+    const closeEditButton =
+        document.getElementById("closeEditButton");
+
+    const editDisplayName =
+        document.getElementById("editDisplayName");
+
+    const editUsername =
+        document.getElementById("editUsername");
+
+    const editAvatarPreview =
+        document.getElementById("editAvatarPreview");
+
+    const saveProfileButton =
+        document.getElementById("saveProfileButton");
+
+    const editStatus =
+        document.getElementById("editStatus");
+
+
+    const requestsButton =
+        document.getElementById("requestsButton");
+
+    const connectionsButton =
+        document.getElementById("connectionsButton");
+
+    const chatButton =
+        document.getElementById("chatButton");
+
+
+    const requestCount =
+        document.getElementById("requestCount");
+
+
+    const shareMenuButton =
+        document.getElementById("shareMenuButton");
+
+    const copyUsernameMenuButton =
+        document.getElementById("copyUsernameMenuButton");
+
+    const qrMenuButton =
+        document.getElementById("qrMenuButton");
+
+    const menuConnectionsButton =
+        document.getElementById("menuConnectionsButton");
+
+    const menuRequestsButton =
+        document.getElementById("menuRequestsButton");
+
+    const protectGuestButton =
+        document.getElementById("protectGuestButton");
+
+    const settingsButton =
+        document.getElementById("settingsButton");
+
+    const logoutButton =
+        document.getElementById("logoutButton");
+
+
+    const voiceButton =
+        document.getElementById("voiceButton");
+
+    const videoButton =
+        document.getElementById("videoButton");
+
+    const feedbackPanel =
+        document.getElementById("feedbackPanel");
+
+    const feedbackTitle =
+        document.getElementById("feedbackTitle");
+
+    const feedbackDescription =
+        document.getElementById("feedbackDescription");
+
+    const suggestionInput =
+        document.getElementById("suggestionInput");
+
+    const sendFeedbackButton =
+        document.getElementById("sendFeedbackButton");
+
+    const closeFeedbackButton =
+        document.getElementById("closeFeedbackButton");
+
+    const feedbackStatus =
+        document.getElementById("feedbackStatus");
+
+
+    const showStatusButton =
+        document.getElementById("showStatusButton");
+
+    const hideStatusButton =
+        document.getElementById("hideStatusButton");
+
+    const statusMessage =
+        document.getElementById("statusMessage");
+
+
+    let currentUser = null;
+    let currentProfile = null;
+
+    let selectedAvatar = "🪐";
+    let selectedBackground = "violet";
+
+    let selectedFeature = "";
+    let selectedResponse = "";
+
+    let unsubscribeRequests = null;
+
+
+    function showStatusMessage(message) {
+        statusMessage.textContent = message;
     }
 
-    const requestsReference =
-        collection(db, "connectionRequests");
 
-    const requestsQuery = query(
-        requestsReference,
-        where("receiverUid", "==", user.uid),
-        where("status", "==", "pending")
-    );
+    function showEditMessage(message) {
+        editStatus.textContent = message;
+    }
 
-    unsubscribeRequests = onSnapshot(
-        requestsQuery,
-        snapshot => {
-            const totalRequests = snapshot.size;
 
-            requestCount.textContent = totalRequests;
+    function showFeedbackMessage(message) {
+        feedbackStatus.textContent = message;
+    }
 
-            if (totalRequests > 0) {
-                requestCount.classList.remove("hidden");
-            } else {
-                requestCount.classList.add("hidden");
-            }
-        },
-        error => {
-            console.error(
-                "Request notification error:",
-                error
-            );
+
+    function updateAvatarDisplay(avatar, background) {
+
+        const finalAvatar = avatar || "🪐";
+        const finalBackground = background || "violet";
+
+        avatarPreview.textContent = finalAvatar;
+
+        avatarPreview.className =
+            `avatar ${finalBackground}`;
+
+        editAvatarPreview.textContent =
+            finalAvatar;
+
+        editAvatarPreview.className =
+            `edit-avatar-preview ${finalBackground}`;
+    }
+
+
+    function updateMenuProfile() {
+
+        if (!currentProfile) {
+            menuProfileName.textContent = "Guest";
+            menuProfileUsername.textContent = "";
+            return;
         }
-    );
-}
 
-        onAuthStateChanged(auth, async user => {
-            if (!user) {
-                window.location.href = "login.html";
-                return;
-            }
+        menuProfileName.textContent =
+            currentProfile.displayName || "Meet Me user";
 
-            currentUser = user;
-            
-            listenForRequestNotifications(user);
+        menuProfileUsername.textContent =
+            currentProfile.username
+                ? `@${currentProfile.username}`
+                : "";
+    }
 
-            try {
-                const userReference =
-                    doc(db, "users", user.uid);
 
-                const userSnapshot =
-                    await getDoc(userReference);
+    function openMenu() {
+        menuOverlay.classList.add("visible");
+    }
 
-                if (!userSnapshot.exists()) {
-                    displayNameElement.textContent = "Welcome";
-                    usernameElement.textContent = "";
-                    emailElement.textContent = user.email || "";
-                    return;
-                }
 
-                currentProfile = userSnapshot.data();
+    function closeMenu() {
+        menuOverlay.classList.remove("visible");
+    }
 
-                const displayName =
-                    currentProfile.displayName || "Meet Me user";
 
-                const username =
-                    currentProfile.username || "";
+    function openEditProfile() {
 
-                displayNameElement.textContent = displayName;
-                usernameElement.textContent =
-                    username ? `@${username}` : "";
-                emailElement.textContent =
-                    user.email || "Email hidden";
+        closeMenu();
 
-                welcomeTitle.textContent =
-                    `Welcome, ${displayName}`;
+        if (!currentProfile) {
+            showStatusMessage(
+                "Your profile is still loading."
+            );
+            return;
+        }
 
-                updateAvatar(
-                    currentProfile.avatar,
-                    currentProfile.avatarBackground
+        editDisplayName.value =
+            currentProfile.displayName || "";
+
+        editUsername.value =
+            currentProfile.username || "";
+
+        selectedAvatar =
+            currentProfile.avatar || "🪐";
+
+        selectedBackground =
+            currentProfile.avatarBackground || "violet";
+
+        document.querySelectorAll(".emoji-button")
+            .forEach(button => {
+
+                button.classList.toggle(
+                    "selected",
+                    button.dataset.emoji === selectedAvatar
                 );
 
-                const savedVisibility =
-                    currentProfile.showOnlineStatus !== false;
+            });
 
-                if (savedVisibility) {
-                    showStatusButton.classList.add("selected");
-                    hideStatusButton.classList.remove("selected");
-                } else {
-                    hideStatusButton.classList.add("selected");
-                    showStatusButton.classList.remove("selected");
-                }
+        document.querySelectorAll(".background-button")
+            .forEach(button => {
 
-            } catch (error) {
-                console.error(error);
-                displayNameElement.textContent = "Could not load profile";
-                showStatusMessage("Please refresh and try again.");
-            }
+                button.classList.toggle(
+                    "selected",
+                    button.dataset.background === selectedBackground
+                );
+
+            });
+
+        updateAvatarDisplay(
+            selectedAvatar,
+            selectedBackground
+        );
+
+        showEditMessage("");
+
+        editPanel.classList.add("visible");
+
+        editPanel.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
         });
+    }
 
-        changeAvatarButton.addEventListener("click", () => {
-            window.location.href = "avatar.html";
-        });
 
-        copyUsernameButton.addEventListener("click", async () => {
-            if (!currentProfile?.username) {
-                showStatusMessage("Username is not available yet.");
-                return;
+    function closeEditProfile() {
+        editPanel.classList.remove("visible");
+    }
+
+
+    function createGuestUsername(uid) {
+
+        return `guest_${uid.slice(0, 8).toLowerCase()}`;
+    }
+
+
+    async function ensureProfile(user) {
+
+        const userReference =
+            doc(db, "users", user.uid);
+
+        const snapshot =
+            await getDoc(userReference);
+
+
+        if (snapshot.exists()) {
+
+            currentProfile =
+                snapshot.data();
+
+            return;
+        }
+
+
+        const guestUsername =
+            createGuestUsername(user.uid);
+
+
+        const guestProfile = {
+
+            uid: user.uid,
+
+            displayName: "Meet Me Guest",
+
+            username: guestUsername,
+
+            avatar: "🪐",
+
+            avatarBackground: "violet",
+
+            showOnlineStatus: true,
+
+            isGuest: user.isAnonymous === true,
+
+            createdAt: serverTimestamp()
+
+        };
+
+
+        await setDoc(
+            userReference,
+            guestProfile
+        );
+
+
+        await setDoc(
+            doc(db, "usernames", guestUsername),
+            {
+                uid: user.uid
             }
+        );
 
-            const username =
-                `@${currentProfile.username}`;
 
-            try {
-                if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(username);
-                    showStatusMessage("Username copied.");
-                } else {
-                    showStatusMessage(
-                        `Your username is ${username}`
+        currentProfile = guestProfile;
+    }
+
+
+    async function saveProfile() {
+
+        if (!currentUser || !currentProfile) {
+            return;
+        }
+
+
+        const newDisplayName =
+            editDisplayName.value.trim();
+
+
+        let newUsername =
+            editUsername.value
+                .trim()
+                .toLowerCase()
+                .replace(/^@/, "");
+
+
+        newUsername =
+            newUsername.replace(
+                /[^a-z0-9._]/g,
+                ""
+            );
+
+
+        if (!newDisplayName) {
+
+            showEditMessage(
+                "Please enter a display name."
+            );
+
+            return;
+        }
+
+
+        if (
+            newUsername.length < 3 ||
+            newUsername.length > 30
+        ) {
+
+            showEditMessage(
+                "Username must be 3–30 characters."
+            );
+
+            return;
+        }
+
+
+        saveProfileButton.disabled = true;
+        saveProfileButton.textContent =
+            "Saving...";
+
+
+        try {
+
+            const oldUsername =
+                currentProfile.username || "";
+
+
+            await runTransaction(
+                db,
+                async transaction => {
+
+                    const newUsernameReference =
+                        doc(
+                            db,
+                            "usernames",
+                            newUsername
+                        );
+
+
+                    if (
+                        newUsername !== oldUsername
+                    ) {
+
+                        const usernameSnapshot =
+                            await transaction.get(
+                                newUsernameReference
+                            );
+
+
+                        if (
+                            usernameSnapshot.exists() &&
+                            usernameSnapshot.data().uid !==
+                            currentUser.uid
+                        ) {
+
+                            throw new Error(
+                                "USERNAME_TAKEN"
+                            );
+                        }
+                    }
+
+
+                    const userReference =
+                        doc(
+                            db,
+                            "users",
+                            currentUser.uid
+                        );
+
+
+                    transaction.update(
+                        userReference,
+                        {
+                            displayName:
+                                newDisplayName,
+
+                            username:
+                                newUsername,
+
+                            avatar:
+                                selectedAvatar,
+
+                            avatarBackground:
+                                selectedBackground
+                        }
                     );
+
+
+                    transaction.set(
+                        newUsernameReference,
+                        {
+                            uid: currentUser.uid
+                        }
+                    );
+
+
+                    if (
+                        oldUsername &&
+                        oldUsername !== newUsername
+                    ) {
+
+                        const oldUsernameReference =
+                            doc(
+                                db,
+                                "usernames",
+                                oldUsername
+                            );
+
+                        transaction.delete(
+                            oldUsernameReference
+                        );
+                    }
                 }
-            } catch (error) {
+            );
+
+
+            currentProfile.displayName =
+                newDisplayName;
+
+            currentProfile.username =
+                newUsername;
+
+            currentProfile.avatar =
+                selectedAvatar;
+
+            currentProfile.avatarBackground =
+                selectedBackground;
+
+
+            displayNameElement.textContent =
+                newDisplayName;
+
+            usernameElement.textContent =
+                `@${newUsername}`;
+
+            welcomeTitle.textContent =
+                `Welcome, ${newDisplayName}`;
+
+            updateAvatarDisplay(
+                selectedAvatar,
+                selectedBackground
+            );
+
+            updateMenuProfile();
+
+
+            showEditMessage(
+                "Profile saved successfully."
+            );
+
+            showStatusMessage(
+                "Your profile has been updated."
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            if (
+                error.message ===
+                "USERNAME_TAKEN"
+            ) {
+
+                showEditMessage(
+                    "That username is already taken."
+                );
+
+            } else {
+
+                showEditMessage(
+                    "Could not save your profile. Try again."
+                );
+            }
+
+        } finally {
+
+            saveProfileButton.disabled = false;
+
+            saveProfileButton.textContent =
+                "Save profile";
+        }
+    }
+
+
+    async function shareProfile() {
+
+        if (!currentProfile?.username) {
+
+            showStatusMessage(
+                "Set a username before sharing your profile."
+            );
+
+            return;
+        }
+
+
+        const profileLink =
+            `${window.location.origin}` +
+            `${window.location.pathname.replace(
+                "home.html",
+                ""
+            )}` +
+            `profile.html?u=${encodeURIComponent(
+                currentProfile.username
+            )}`;
+
+
+        const shareText =
+            `Connect with me on Meet Me without sharing numbers.\n` +
+            profileLink;
+
+
+        try {
+
+            if (navigator.share) {
+
+                await navigator.share({
+
+                    title:
+                        "Connect with me on Meet Me",
+
+                    text:
+                        shareText,
+
+                    url:
+                        profileLink
+                });
+
+                showStatusMessage(
+                    "Share menu opened."
+                );
+
+            } else if (navigator.clipboard) {
+
+                await navigator.clipboard.writeText(
+                    profileLink
+                );
+
+                showStatusMessage(
+                    "Profile link copied."
+                );
+
+            } else {
+
+                showStatusMessage(
+                    profileLink
+                );
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Share cancelled or unavailable."
+            );
+        }
+    }
+
+
+    async function copyUsername() {
+
+        if (!currentProfile?.username) {
+
+            showStatusMessage(
+                "Username is not available yet."
+            );
+
+            return;
+        }
+
+
+        const username =
+            `@${currentProfile.username}`;
+
+
+        try {
+
+            if (navigator.clipboard) {
+
+                await navigator.clipboard.writeText(
+                    username
+                );
+
+                showStatusMessage(
+                    "Username copied."
+                );
+
+            } else {
+
                 showStatusMessage(
                     `Your username is ${username}`
                 );
             }
-        });
 
-        shareProfileButton.addEventListener("click", async () => {
-            if (!currentProfile?.username) {
-                showStatusMessage("Username is not available yet.");
+        } catch (error) {
+
+            showStatusMessage(
+                `Your username is ${username}`
+            );
+        }
+    }
+
+
+    function showQrMessage() {
+
+        showStatusMessage(
+            "QR profile sharing will be added next."
+        );
+    }
+
+
+    function listenForRequestNotifications(user) {
+
+        if (unsubscribeRequests) {
+            unsubscribeRequests();
+        }
+
+
+        const requestsReference =
+            collection(
+                db,
+                "connectionRequests"
+            );
+
+
+        const requestsQuery =
+            query(
+                requestsReference,
+                where(
+                    "receiverUid",
+                    "==",
+                    user.uid
+                ),
+                where(
+                    "status",
+                    "==",
+                    "pending"
+                )
+            );
+
+
+        unsubscribeRequests =
+            onSnapshot(
+                requestsQuery,
+                snapshot => {
+
+                    const totalRequests =
+                        snapshot.size;
+
+
+                    requestCount.textContent =
+                        totalRequests;
+
+
+                    if (totalRequests > 0) {
+
+                        requestCount.classList.remove(
+                            "hidden"
+                        );
+
+                    } else {
+
+                        requestCount.classList.add(
+                            "hidden"
+                        );
+                    }
+                },
+
+                error => {
+
+                    console.error(
+                        "Request notification error:",
+                        error
+                    );
+                }
+            );
+    }
+
+
+    onAuthStateChanged(
+        auth,
+        async user => {
+
+            if (!user) {
+
+                window.location.href =
+                    "login.html";
+
                 return;
             }
 
-            const profileLink =
-                `${window.location.origin}` +
-                `${window.location.pathname.replace("home.html", "")}` +
-                `profile.html?u=${encodeURIComponent(
-                    currentProfile.username
-                )}`;
 
-            const shareText =
-                `Connect with me on Meet Me without sharing numbers.\n` +
-                profileLink;
+            currentUser = user;
+
+
+            listenForRequestNotifications(
+                user
+            );
+
 
             try {
-                if (navigator.share) {
-                    await navigator.share({
-                        title: "Connect with me on Meet Me",
-                        text: shareText,
-                        url: profileLink
-                    });
 
-                    showStatusMessage("Share menu opened.");
-                } else if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(profileLink);
-                    showStatusMessage("Profile link copied.");
+                await ensureProfile(
+                    user
+                );
+
+
+                const displayName =
+                    currentProfile.displayName ||
+                    "Meet Me user";
+
+
+                const username =
+                    currentProfile.username ||
+                    "";
+
+
+                displayNameElement.textContent =
+                    displayName;
+
+
+                usernameElement.textContent =
+                    username
+                        ? `@${username}`
+                        : "";
+
+
+                if (user.isAnonymous) {
+
+                    emailElement.textContent =
+                        "Temporary guest account";
+
+                    guestLabel.style.display =
+                        "inline-block";
+
+                    protectGuestButton.style.display =
+                        "flex";
+
                 } else {
-                    showStatusMessage(profileLink);
+
+                    emailElement.textContent =
+                        user.email ||
+                        "Email hidden";
+
+                    guestLabel.style.display =
+                        "none";
+
+                    protectGuestButton.style.display =
+                        "none";
                 }
+
+
+                welcomeTitle.textContent =
+                    `Welcome, ${displayName}`;
+
+
+                updateAvatarDisplay(
+                    currentProfile.avatar,
+                    currentProfile.avatarBackground
+                );
+
+
+                updateMenuProfile();
+
+
+                const savedVisibility =
+                    currentProfile.showOnlineStatus !== false;
+
+
+                if (savedVisibility) {
+
+                    showStatusButton.classList.add(
+                        "selected"
+                    );
+
+                    hideStatusButton.classList.remove(
+                        "selected"
+                    );
+
+                } else {
+
+                    hideStatusButton.classList.add(
+                        "selected"
+                    );
+
+                    showStatusButton.classList.remove(
+                        "selected"
+                    );
+                }
+
+
             } catch (error) {
-                console.log("Share cancelled or unavailable.");
+
+                console.error(error);
+
+                displayNameElement.textContent =
+                    "Could not load profile";
+
+                showStatusMessage(
+                    "Please refresh and try again."
+                );
             }
-        });
+        }
+    );
 
-        qrButton.addEventListener("click", () => {
-            showStatusMessage(
-                "QR code will be added after the public profile page."
-            );
-        });
 
-        requestsButton.addEventListener("click", () => {
-    window.location.href = "requests.html";
-});
-        connectionsButton.addEventListener("click", () => {
-    window.location.href = "connections.html";
-});
+    /* Menu */
 
-        chatButton.addEventListener("click", () => {
-            showStatusMessage(
-                "Chat interface will be connected in the next step."
-            );
-        });
+    menuButton.addEventListener(
+        "click",
+        openMenu
+    );
 
-        voiceButton.addEventListener("click", () => {
-            openFeedback("Voice calls");
-        });
 
-        videoButton.addEventListener("click", () => {
-            openFeedback("Video calls");
-        });
+    closeMenuButton.addEventListener(
+        "click",
+        closeMenu
+    );
 
-        document.querySelectorAll("[data-response]").forEach(button => {
-            button.addEventListener("click", () => {
-                selectedResponse = button.dataset.response;
 
-                document.querySelectorAll("[data-response]").forEach(item => {
-                    item.style.outline = "none";
+    menuOverlay.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                menuOverlay
+            ) {
+
+                closeMenu();
+            }
+        }
+    );
+
+
+    /* Edit profile */
+
+    editProfileMenuButton.addEventListener(
+        "click",
+        openEditProfile
+    );
+
+
+    closeEditButton.addEventListener(
+        "click",
+        closeEditProfile
+    );
+
+
+    document.querySelectorAll(
+        ".emoji-button"
+    ).forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                selectedAvatar =
+                    button.dataset.emoji;
+
+
+                document.querySelectorAll(
+                    ".emoji-button"
+                ).forEach(item => {
+
+                    item.classList.remove(
+                        "selected"
+                    );
                 });
 
-                button.style.outline = "2px solid #f0abfc";
+
+                button.classList.add(
+                    "selected"
+                );
+
+
+                updateAvatarDisplay(
+                    selectedAvatar,
+                    selectedBackground
+                );
+            }
+        );
+    });
+
+
+    document.querySelectorAll(
+        ".background-button"
+    ).forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                selectedBackground =
+                    button.dataset.background;
+
+
+                document.querySelectorAll(
+                    ".background-button"
+                ).forEach(item => {
+
+                    item.classList.remove(
+                        "selected"
+                    );
+                });
+
+
+                button.classList.add(
+                    "selected"
+                );
+
+
+                updateAvatarDisplay(
+                    selectedAvatar,
+                    selectedBackground
+                );
+            }
+        );
+    });
+
+
+    saveProfileButton.addEventListener(
+        "click",
+        saveProfile
+    );
+
+
+    /* Menu actions */
+
+    shareMenuButton.addEventListener(
+        "click",
+        async () => {
+
+            closeMenu();
+
+            await shareProfile();
+        }
+    );
+
+
+    copyUsernameMenuButton.addEventListener(
+        "click",
+        async () => {
+
+            closeMenu();
+
+            await copyUsername();
+        }
+    );
+
+
+    qrMenuButton.addEventListener(
+        "click",
+        () => {
+
+            closeMenu();
+
+            showQrMessage();
+        }
+    );
+
+
+    menuConnectionsButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "connections.html";
+        }
+    );
+
+
+    menuRequestsButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "requests.html";
+        }
+    );
+
+
+    requestsButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "requests.html";
+        }
+    );
+
+
+    connectionsButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "connections.html";
+        }
+    );
+
+
+    chatButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "connections.html";
+        }
+    );
+
+
+    protectGuestButton.addEventListener(
+        "click",
+        () => {
+
+            closeMenu();
+
+            showStatusMessage(
+                "Guest account protection will be connected to Google sign-in next."
+            );
+        }
+    );
+
+
+    settingsButton.addEventListener(
+        "click",
+        () => {
+
+            closeMenu();
+
+            showStatusMessage(
+                "More settings will be added here."
+            );
+        }
+    );
+
+
+    /* Feedback */
+
+    function openFeedback(featureName) {
+
+        selectedFeature =
+            featureName;
+
+        selectedResponse =
+            "";
+
+
+        feedbackTitle.textContent =
+            `${featureName} are coming later`;
+
+
+        feedbackDescription.textContent =
+            `This feature is currently unavailable. ` +
+            `Would you like to use ${featureName.toLowerCase()} ` +
+            `through Meet Me?`;
+
+
+        suggestionInput.value =
+            "";
+
+        showFeedbackMessage(
+            ""
+        );
+
+
+        feedbackPanel.classList.add(
+            "visible"
+        );
+    }
+
+
+    voiceButton.addEventListener(
+        "click",
+        () => {
+
+            openFeedback(
+                "Voice calls"
+            );
+        }
+    );
+
+
+    videoButton.addEventListener(
+        "click",
+        () => {
+
+            openFeedback(
+                "Video calls"
+            );
+        }
+    );
+
+
+    document.querySelectorAll(
+        "[data-response]"
+    ).forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                selectedResponse =
+                    button.dataset.response;
+
+
+                document.querySelectorAll(
+                    "[data-response]"
+                ).forEach(item => {
+
+                    item.style.outline =
+                        "none";
+                });
+
+
+                button.style.outline =
+                    "2px solid #f0abfc";
+
 
                 showFeedbackMessage(
                     "Your response is selected. You can send it now."
                 );
-            });
-        });
+            }
+        );
+    });
 
-        sendFeedbackButton.addEventListener("click", async () => {
+
+    sendFeedbackButton.addEventListener(
+        "click",
+        async () => {
+
             if (!currentUser) {
-                showFeedbackMessage("Please wait for your account to load.");
+
+                showFeedbackMessage(
+                    "Please wait for your account to load."
+                );
+
                 return;
             }
+
 
             if (!selectedResponse) {
-                showFeedbackMessage("Please choose one response first.");
+
+                showFeedbackMessage(
+                    "Please choose one response first."
+                );
+
                 return;
             }
 
-            sendFeedbackButton.disabled = true;
-            sendFeedbackButton.textContent = "Sending...";
+
+            sendFeedbackButton.disabled =
+                true;
+
+            sendFeedbackButton.textContent =
+                "Sending...";
+
 
             try {
+
                 await addDoc(
-                    collection(db, "featureFeedback"),
+                    collection(
+                        db,
+                        "featureFeedback"
+                    ),
                     {
-                        uid: currentUser.uid,
-                        username: currentProfile?.username || "",
-                        feature: selectedFeature,
-                        response: selectedResponse,
-                        suggestion: suggestionInput.value.trim(),
-                        createdAt: serverTimestamp()
+
+                        uid:
+                            currentUser.uid,
+
+                        username:
+                            currentProfile?.username ||
+                            "",
+
+                        feature:
+                            selectedFeature,
+
+                        response:
+                            selectedResponse,
+
+                        suggestion:
+                            suggestionInput.value.trim(),
+
+                        createdAt:
+                            serverTimestamp()
                     }
                 );
+
 
                 showFeedbackMessage(
                     "Thanks. Your feedback has been received."
                 );
 
-                suggestionInput.value = "";
+
+                suggestionInput.value =
+                    "";
 
             } catch (error) {
+
                 console.error(error);
+
                 showFeedbackMessage(
                     "Could not send feedback. Please try again."
                 );
+
             } finally {
-                sendFeedbackButton.disabled = false;
-                sendFeedbackButton.textContent = "Send feedback";
+
+                sendFeedbackButton.disabled =
+                    false;
+
+                sendFeedbackButton.textContent =
+                    "Send feedback";
             }
-        });
+        }
+    );
 
-        closeFeedbackButton.addEventListener("click", () => {
-            feedbackPanel.classList.remove("visible");
-        });
 
-        showStatusButton.addEventListener("click", async () => {
+    closeFeedbackButton.addEventListener(
+        "click",
+        () => {
+
+            feedbackPanel.classList.remove(
+                "visible"
+            );
+        }
+    );
+
+
+    /* Online status */
+
+    showStatusButton.addEventListener(
+        "click",
+        async () => {
+
             if (!currentUser) return;
 
+
             try {
+
                 await updateDoc(
-                    doc(db, "users", currentUser.uid),
+                    doc(
+                        db,
+                        "users",
+                        currentUser.uid
+                    ),
                     {
-                        showOnlineStatus: true
+                        showOnlineStatus:
+                            true
                     }
                 );
 
-                showStatusButton.classList.add("selected");
-                hideStatusButton.classList.remove("selected");
+
+                currentProfile.showOnlineStatus =
+                    true;
+
+
+                showStatusButton.classList.add(
+                    "selected"
+                );
+
+                hideStatusButton.classList.remove(
+                    "selected"
+                );
+
 
                 showStatusMessage(
                     "Your online/offline status is visible."
                 );
 
             } catch (error) {
+
                 console.error(error);
+
                 showStatusMessage(
                     "Could not update your privacy setting."
                 );
             }
-        });
+        }
+    );
 
-        hideStatusButton.addEventListener("click", async () => {
+
+    hideStatusButton.addEventListener(
+        "click",
+        async () => {
+
             if (!currentUser) return;
 
+
             try {
+
                 await updateDoc(
-                    doc(db, "users", currentUser.uid),
+                    doc(
+                        db,
+                        "users",
+                        currentUser.uid
+                    ),
                     {
-                        showOnlineStatus: false
+                        showOnlineStatus:
+                            false
                     }
                 );
 
-                hideStatusButton.classList.add("selected");
-                showStatusButton.classList.remove("selected");
+
+                currentProfile.showOnlineStatus =
+                    false;
+
+
+                hideStatusButton.classList.add(
+                    "selected"
+                );
+
+                showStatusButton.classList.remove(
+                    "selected"
+                );
+
 
                 showStatusMessage(
                     "Your online/offline status is hidden."
                 );
 
             } catch (error) {
+
                 console.error(error);
+
                 showStatusMessage(
                     "Could not update your privacy setting."
                 );
             }
-        });
+        }
+    );
 
-        logoutButton.addEventListener("click", async () => {
+
+    /* Logout */
+
+    logoutButton.addEventListener(
+        "click",
+        async () => {
+
             try {
+
                 await signOut(auth);
-                window.location.href = "login.html";
+
+                window.location.href =
+                    "login.html";
+
             } catch (error) {
+
                 console.error(error);
-                showStatusMessage("Could not log out. Try again.");
+
+                showStatusMessage(
+                    "Could not log out. Try again."
+                );
             }
-        });
-    </script>
+        }
+    );
+
+</script>
+
 </body>
 </html>
