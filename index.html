@@ -138,8 +138,36 @@
             color: white;
         }
 
+        .guest-btn {
+            background: transparent;
+
+            border: 1px solid #303044;
+
+            color: #c8c8dc;
+        }
+
+        .guest-btn:hover {
+            border-color: #7c3aed;
+            color: white;
+        }
+
         button:active {
             transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .guest-info {
+            margin-top: 10px;
+
+            color: #666678;
+
+            font-size: 11px;
+
+            line-height: 1.5;
         }
 
         .footer {
@@ -148,6 +176,16 @@
             color: #666678;
 
             font-size: 12px;
+        }
+
+        .status {
+            min-height: 20px;
+
+            margin-top: 12px;
+
+            color: #ff8fa3;
+
+            font-size: 13px;
         }
     </style>
 </head>
@@ -196,12 +234,13 @@
         <div class="card">
 
             <div class="card-title">
-                📞 Calls coming later
+                🚀 Try it first
             </div>
 
             <div class="card-text">
-                Voice and video calling will be added
-                after the messaging system is ready.
+                You can enter Meet Me as a guest without
+                creating an account. Create an account later
+                if you want to keep your identity and data.
             </div>
 
         </div>
@@ -210,9 +249,9 @@
         <div class="buttons">
 
             <button
-    class="create-btn"
-    onclick="window.location.href='create-account.html'">
-    Create Account
+                class="create-btn"
+                onclick="window.location.href='create-account.html'">
+                Create Account
             </button>
 
             <button
@@ -221,6 +260,19 @@
                 Log In
             </button>
 
+            <button
+                class="guest-btn"
+                id="guestBtn">
+                Continue as Guest
+            </button>
+
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="guest-info">
+            Guest accounts are temporary until you choose to protect
+            your account.
         </div>
 
 
@@ -231,16 +283,57 @@
     </main>
 
 
-    <script>
+    <script type="module">
+
+        import {
+            signInAnonymously
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+        import {
+            auth
+        } from "./js/firebase.js";
 
 
-        document
-            .getElementById("login")
-            .addEventListener("click", function () {
+        const guestBtn =
+            document.getElementById("guestBtn");
 
-                alert("Login will be added soon.");
+        const status =
+            document.getElementById("status");
 
-            });
+
+        guestBtn.addEventListener("click", async () => {
+
+            guestBtn.disabled = true;
+
+            guestBtn.textContent = "Entering Meet Me...";
+
+            status.textContent = "";
+
+
+            try {
+
+                await signInAnonymously(auth);
+
+                window.location.href = "home.html";
+
+            } catch (error) {
+
+                console.error(
+                    "Guest sign-in failed:",
+                    error
+                );
+
+                guestBtn.disabled = false;
+
+                guestBtn.textContent =
+                    "Continue as Guest";
+
+                status.textContent =
+                    "Could not start guest mode. Please try again.";
+
+            }
+
+        });
 
     </script>
 
