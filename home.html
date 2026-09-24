@@ -1132,7 +1132,9 @@
     import {
         getAuth,
         onAuthStateChanged,
-        signOut
+        signOut,
+        googleAuthProvider,
+        linkwithPopup
     } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
     import {
@@ -2243,17 +2245,109 @@
     );
 
 
-    protectGuestButton.addEventListener(
-        "click",
-        () => {
+    async function protectGuestAccount() {
 
-            closeMenu();
+    if (!currentUser) {
+        showStatusMessage(
+            "Please wait for your guest account to load."
+        );
+        return;
+    }
+
+    if (!currentUser.isAnonymous) {
+        showStatusMessage(
+            "This account is already protected."
+        );
+        return;
+    }
+
+    const provider =
+        new GoogleAuthProvider();
+
+    protectGuestButton.disabled = true;
+
+    showStatusMessage(
+        "Opening Google sign-in..."
+    );
+
+    try {
+
+        const result =
+            await linkWithPopup(
+                currentUser,
+                provider
+            );
+
+        currentUser =
+            result.user;
+
+        if (currentProfile) {
+            currentProfile.isGuest = false;
+        }
+
+        emailElement.textContent =
+            currentUser.email ||
+            "Email hidden";
+
+        guestLabel.style.display =
+            "none";
+
+        protectGuestButton.style.display =
+            "none";
+
+        closeMenu();
+
+        showStatusMessage(
+            "Your guest account is now protected with Google. Your profile, connections and chats stay with this account."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Guest account protection error:",
+            error
+        );
+
+        if (
+            error.code ===
+            "auth/credential-already-in-use"
+        ) {
 
             showStatusMessage(
-                "Guest account protection will be connected to Google sign-in next."
+                "That Google account is already connected to another Meet Me account."
+            );
+
+        } else if (
+            error.code ===
+            "auth/popup-closed-by-user"
+        ) {
+
+            showStatusMessage(
+                "Google sign-in was cancelled."
+            );
+
+        } else {
+
+            showStatusMessage(
+                "Could not protect your guest account. Please try again."
             );
         }
-    );
+
+    } finally {
+
+        protectGuestButton.disabled =
+            false;
+    }
+}
+
+
+protectGuestButton.addEventListener(
+    "click",
+    async () => {
+
+        await protectGuestAccount();
+    }
+);
 
 
     settingsButton.addEventListener(
@@ -2563,30 +2657,81 @@
         }
     );
 
-
     /* Logout */
 
-    logoutButton.addEventListener(
-        "click",
-        async () => {
+logoutButton.addEventListener(
+    "click",
+    async () => {
 
-            try {
+        /*
+         * Guest accounts need an extra warning because
+         * signing out can permanently disconnect the user
+         * from an unprotected anonymous account.
+         */
 
-                await signOut(auth);
+        if (currentUser?.isAnonymous) {
 
-                window.location.href =
-                    "login.html";
+            const protectFirst =
+                confirm(
+                    "Protect your guest account first?\n\n" +
+                    "Your guest account is temporary. " +
+                    "If you log out without protecting it, " +
+                    "you may permanently lose access to this " +
+                    "profile, connections and chats.\n\n" +
+                    "Press OK to protect your account.\n" +
+                    "Press Cancel to continue to the logout choice."
+                );
 
-            } catch (error) {
 
-                console.error(error);
+            if (protectFirst) {
+
+                await protectGuestAccount();
+
+                return;
+            }
+
+
+            const logoutAnyway =
+                confirm(
+                    "Log out anyway?\n\n" +
+                    "This guest account is not protected. " +
+                    "After logging out, you may not be able " +
+                    "to recover this guest account.\n\n" +
+                    "Press OK to log out anyway.\n" +
+                    "Press Cancel to stay here."
+                );
+
+
+            if (!logoutAnyway) {
+
+                closeMenu();
 
                 showStatusMessage(
-                    "Could not log out. Try again."
+                    "You stayed signed in. Your guest account is safe for now."
                 );
+
+                return;
             }
         }
-    );
+
+
+        try {
+
+            await signOut(auth);
+
+            window.location.href =
+                "login.html";
+
+        } catch (error) {
+
+            console.error(error);
+
+            showStatusMessage(
+                "Could not log out. Try again."
+            );
+        }
+    }
+);
 
 </script>
 
