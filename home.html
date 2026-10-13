@@ -711,6 +711,91 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+/* Meet Me QR panel */
+.qr-panel {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(4, 4, 12, 0.85);
+    backdrop-filter: blur(10px);
+}
+
+.qr-panel.visible {
+    display: flex;
+}
+
+.qr-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 24px;
+    text-align: center;
+    border: 1px solid rgba(192, 132, 252, 0.4);
+    border-radius: 26px;
+    background:
+        radial-gradient(circle at top, #30204d, transparent 55%),
+        #101019;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.qr-card h2 {
+    margin: 0 0 8px;
+}
+
+.qr-description {
+    color: #c4bfd2;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.qr-code-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    margin: 20px 0;
+    padding: 14px;
+    border-radius: 20px;
+    background: white;
+}
+
+.qr-code-box img,
+.qr-code-box canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.qr-username {
+    color: #c4b5fd;
+    overflow-wrap: anywhere;
+}
+
+.qr-action {
+    width: 100%;
+    margin-top: 10px;
+    padding: 13px;
+    border-radius: 13px;
+    color: white;
+    background: linear-gradient(135deg, #7c3aed, #06b6d4);
+    font-weight: bold;
+}
+
+.qr-action.secondary {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.qr-message {
+    min-height: 20px;
+    color: #c4b5fd;
+    font-size: 13px;
+}
+
     </style>
 </head>
 
@@ -1123,7 +1208,40 @@
     </aside>
 
 </div>
+    
 
+<!-- My Meet Me QR panel -->
+<div id="qrPanel" class="qr-panel">
+    <section class="qr-card">
+        <h2>✦ My Meet Me QR</h2>
+
+        <p class="qr-description">
+            Let others scan your code to open your profile.
+        </p>
+
+        <div id="qrCodeBox" class="qr-code-box">
+            <span style="color:#333;">
+                Preparing your QR code...
+            </span>
+        </div>
+
+        <div id="qrUsername" class="qr-username"></div>
+
+        <button id="downloadQrButton" class="qr-action">
+            Download QR code
+        </button>
+
+        <button id="closeQrButton"
+                class="qr-action secondary">
+            Close
+        </button>
+
+        <p id="qrMessage" class="qr-message"></p>
+    </section>
+</div>
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script type="module">
 
@@ -1836,12 +1954,56 @@
     }
 
 
-    function showQrMessage() {
 
+function showQrMessage() {
+    if (!currentProfile?.username) {
         showStatusMessage(
-            "QR profile sharing will be added next."
+            "Your username is not ready yet. Please try again."
         );
+        return;
     }
+
+    const qrPanel = document.getElementById("qrPanel");
+    const qrCodeBox = document.getElementById("qrCodeBox");
+    const qrUsername = document.getElementById("qrUsername");
+    const qrMessage = document.getElementById("qrMessage");
+
+    if (typeof QRCode === "undefined") {
+        showStatusMessage(
+            "QR generator did not load. Check your internet connection."
+        );
+        return;
+    }
+
+    const profileUrl = new URL(
+        "profile.html",
+        window.location.href
+    );
+
+    profileUrl.searchParams.set(
+        "u",
+        currentProfile.username
+    );
+
+    qrCodeBox.replaceChildren();
+
+    qrUsername.textContent =
+        "@" + currentProfile.username;
+
+    qrMessage.textContent = "";
+
+    new QRCode(qrCodeBox, {
+        text: profileUrl.href,
+        width: 220,
+        height: 220,
+        colorDark: "#0b0b12",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    qrPanel.classList.add("visible");
+}
+
 
 
     function listenForRequestNotifications(user) {
@@ -2193,6 +2355,51 @@
             showQrMessage();
         }
     );
+
+document.getElementById("closeQrButton")
+    .addEventListener("click", () => {
+        document.getElementById("qrPanel")
+            .classList.remove("visible");
+    });
+
+document.getElementById("qrPanel")
+    .addEventListener("click", event => {
+        if (event.target.id === "qrPanel") {
+            event.currentTarget.classList.remove("visible");
+        }
+    });
+
+document.getElementById("downloadQrButton")
+    .addEventListener("click", () => {
+        const box = document.getElementById("qrCodeBox");
+        const message = document.getElementById("qrMessage");
+
+        const canvas = box.querySelector("canvas");
+        const image = box.querySelector("img");
+
+        let imageUrl = "";
+
+        if (canvas) {
+            imageUrl = canvas.toDataURL("image/png");
+        } else if (image) {
+            imageUrl = image.src;
+        }
+
+        if (!imageUrl) {
+            message.textContent =
+                "QR code is not ready yet. Please try again.";
+            return;
+        }
+
+        const link = document.createElement("a");
+        link.href = imageUrl;
+        link.download = "meet-me-qr.png";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        message.textContent = "Your QR code is ready to save.";
+    });
 
 
     menuConnectionsButton.addEventListener(
