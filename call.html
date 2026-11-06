@@ -160,14 +160,31 @@
             <p class="username" id="callUsername">@loading</p>
 
             <div class="video-area" id="videoArea">
+    <div class="video-area" id="videoArea"
+     style="flex-direction: column; gap: 10px;">
+
+    <!-- Your camera preview -->
     <video
-    id="remoteVideo"
-    autoplay
-    playsinline
-    style="width: 100%; max-width: 400px; display: none;"
-></video>
-                <audio id="remoteAudio" autoplay playsinline></audio>
-</div>
+        id="localVideo"
+        autoplay
+        muted
+        playsinline
+        style="width: 100%; max-width: 400px;"
+    ></video>
+
+    <!-- Other participant's video -->
+    <video
+        id="remoteVideo"
+        autoplay
+        playsinline
+        style="width: 100%; max-width: 400px; display: none;"
+    ></video>
+
+    <!-- Other participant's audio -->
+    <audio id="remoteAudio" autoplay playsinline></audio>
+
+    </div>
+
 
 <button id="startMediaButton" type="button"
     style="margin-top:20px; padding:14px 24px; border:0;
