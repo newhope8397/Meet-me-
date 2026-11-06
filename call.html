@@ -278,7 +278,7 @@ let otherUserUid = null;
 
 let localStream = null;
 let peerConnection = null;
-let callDocRef = null;
+let callDocumentCreated = false;
 
 let unsubscribeCall = null;
 let unsubscribeCandidates = null;
@@ -410,7 +410,7 @@ onAuthStateChanged(auth, user => {
 // Add local ICE candidates to Firestore
 async function saveLocalCandidate(candidate) {
 
-    if (!callDocRef) {
+    if (!callDocRef || !callDocumentCreated) {
 
         pendingLocalCandidates.push(candidate);
         return;
@@ -603,6 +603,7 @@ startMediaButton.addEventListener("click", async () => {
             createdAt: serverTimestamp()
 
         });
+        callDocumentCreated = true;
 
 
         // Save candidates collected during offer creation
