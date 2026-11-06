@@ -409,6 +409,40 @@
 
         const connectionId =
             urlParams.get("connection");
+        // Voice and video call buttons
+const voiceCallButton =
+    document.getElementById("voiceCallButton");
+
+const videoCallButton =
+    document.getElementById("videoCallButton");
+
+
+// Open voice call
+voiceCallButton.addEventListener("click", () => {
+
+    if (!connectionId) {
+        alert("Connection not found.");
+        return;
+    }
+
+    window.location.href =
+        `call.html?connection=${encodeURIComponent(connectionId)}&type=voice`;
+
+});
+
+
+// Open video call
+videoCallButton.addEventListener("click", () => {
+
+    if (!connectionId) {
+        alert("Connection not found.");
+        return;
+    }
+
+    window.location.href =
+        `call.html?connection=${encodeURIComponent(connectionId)}&type=video`;
+
+});
 
         let currentUser = null;
         let currentConnection = null;
