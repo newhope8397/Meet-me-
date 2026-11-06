@@ -161,12 +161,12 @@
 
             <div class="video-area" id="videoArea">
     <video
-        id="localVideo"
-        autoplay
-        muted
-        playsinline
-        style="width:100%; height:100%; object-fit:cover; border-radius:20px;"
-    ></video>
+    id="remoteVideo"
+    autoplay
+    playsinline
+    style="width: 100%; max-width: 400px; display: none;"
+></video>
+                <audio id="remoteAudio" autoplay playsinline></audio>
 </div>
 
 <button id="startMediaButton" type="button"
@@ -212,9 +212,14 @@ import {
 import {
     getFirestore,
     doc,
-    getDoc
+    getDoc,
+    collection,
+    addDoc,
+    setDoc,
+    updateDoc,
+    onSnapshot,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-
 
 // Firebase setup
 const auth = getAuth(app);
