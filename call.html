@@ -160,8 +160,21 @@
             <p class="username" id="callUsername">@loading</p>
 
             <div class="video-area" id="videoArea">
-                Video will appear here
-            </div>
+    <video
+        id="localVideo"
+        autoplay
+        muted
+        playsinline
+        style="width:100%; height:100%; object-fit:cover; border-radius:20px;"
+    ></video>
+</div>
+
+<button id="startMediaButton" type="button"
+    style="margin-top:20px; padding:14px 24px; border:0;
+    border-radius:14px; background:#7c3aed; color:white;
+    font-size:15px; cursor:pointer;">
+    Enable microphone / camera
+</button>
 
             <p class="call-status" id="callStatus">Preparing call...</p>
             <p class="call-timer" id="callTimer"></p>
@@ -240,9 +253,57 @@
 
     // End call button
     endCallButton.addEventListener("click", () => {
-        window.location.href =
-            `chat.html?connection=${encodeURIComponent(connectionId || "")}`;
-    });
+
+    // Stop microphone and camera
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+    }
+
+    window.location.href =
+        `chat.html?connection=${encodeURIComponent(connectionId || "")}`;
+});
+        // WebRTC media preparation
+const startMediaButton =
+    document.getElementById("startMediaButton");
+
+const localVideo =
+    document.getElementById("localVideo");
+
+let localStream = null;
+
+startMediaButton.addEventListener("click", async () => {
+    try {
+        startMediaButton.disabled = true;
+        callStatus.textContent = "Requesting device permission...";
+
+        // Request microphone and, for video calls, camera
+        const constraints = {
+            audio: true,
+            video: callType === "video"
+        };
+
+        localStream =
+            await navigator.mediaDevices.getUserMedia(constraints);
+
+        // Display local camera preview for video calls
+        if (callType === "video") {
+            localVideo.srcObject = localStream;
+        }
+
+        callStatus.textContent =
+            "Microphone and camera are ready.";
+
+        startMediaButton.textContent = "Media ready";
+
+    } catch (error) {
+        console.error("Media access error:", error);
+
+        callStatus.textContent =
+            "Could not access microphone or camera.";
+
+        startMediaButton.disabled = false;
+    }
+});
     </script>
 
     
