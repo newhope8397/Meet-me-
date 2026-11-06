@@ -187,6 +187,64 @@
         </section>
 
     </main>
+    <script>
+    // Read call information from the URL
+    const params = new URLSearchParams(window.location.search);
 
+    const connectionId = params.get("connection");
+    const callType = params.get("type");
+
+    // Get interface elements
+    const callTypeElement = document.getElementById("callType");
+    const callStatus = document.getElementById("callStatus");
+    const muteButton = document.getElementById("muteButton");
+    const speakerButton = document.getElementById("speakerButton");
+    const endCallButton = document.getElementById("endCallButton");
+    const videoArea = document.getElementById("videoArea");
+
+    // Validate call information
+    if (!connectionId || !["voice", "video"].includes(callType)) {
+        callStatus.textContent = "Invalid call information.";
+    } else {
+        callTypeElement.textContent =
+            callType === "video" ? "Video Call" : "Voice Call";
+
+        callStatus.textContent = "Call interface ready.";
+        
+        if (callType === "video") {
+            videoArea.style.display = "flex";
+        }
+    }
+
+    // Mute button (interface state only for now)
+    let isMuted = false;
+
+    muteButton.addEventListener("click", () => {
+        isMuted = !isMuted;
+
+        muteButton.textContent = isMuted ? "🔇" : "🎙️";
+        muteButton.nextElementSibling.textContent =
+            isMuted ? "Unmute" : "Mute";
+    });
+
+    // Speaker button (interface state only for now)
+    let isSpeakerOn = false;
+
+    speakerButton.addEventListener("click", () => {
+        isSpeakerOn = !isSpeakerOn;
+
+        speakerButton.textContent = isSpeakerOn ? "🔈" : "🔊";
+        speakerButton.nextElementSibling.textContent =
+            isSpeakerOn ? "Speaker off" : "Speaker";
+    });
+
+    // End call button
+    endCallButton.addEventListener("click", () => {
+        window.location.href =
+            `chat.html?connection=${encodeURIComponent(connectionId || "")}`;
+    });
+    </script>
+
+    
 </body>
 </html>
