@@ -1,1 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet Me | Call</title>
 
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #080812;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .call-screen {
+            width: 100%;
+            max-width: 430px;
+            min-height: 85vh;
+            padding: 35px 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 28px;
+            background: linear-gradient(160deg, #171329, #090b18);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .call-type {
+            color: #a78bfa;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .avatar {
+            width: 115px;
+            height: 115px;
+            border-radius: 35px;
+            background: linear-gradient(135deg, #7c3aed, #0891b2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 55px;
+            margin: 30px 0 20px;
+            box-shadow: 0 0 45px rgba(124,58,237,0.25);
+        }
+
+        h1 {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .username {
+            color: #aaa6bd;
+            font-size: 14px;
+        }
+
+        .call-status {
+            color: #c4b5fd;
+            font-size: 15px;
+            margin-top: 25px;
+        }
+
+        .call-timer {
+            color: #aaa6bd;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .call-controls {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            margin-top: 50px;
+        }
+
+        .control-button {
+            width: 62px;
+            height: 62px;
+            border: none;
+            border-radius: 50%;
+            background: #29263b;
+            color: white;
+            font-size: 23px;
+            cursor: pointer;
+        }
+
+        .end-call {
+            background: #e53955;
+            transform: rotate(135deg);
+        }
+
+        .control-label {
+            color: #aaa6bd;
+            font-size: 12px;
+            margin-top: 9px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .video-area {
+            display: none;
+            width: 100%;
+            height: 260px;
+            border-radius: 20px;
+            background: #171329;
+            margin-top: 25px;
+            align-items: center;
+            justify-content: center;
+            color: #aaa6bd;
+            font-size: 14px;
+        }
+
+        @media (max-height: 650px) {
+            .call-screen {
+                min-height: 95vh;
+                padding: 20px;
+            }
+
+            .avatar {
+                width: 85px;
+                height: 85px;
+                font-size: 40px;
+                margin: 15px 0;
+            }
+
+            .call-controls {
+                margin-top: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="call-screen">
+
+        <div class="call-type" id="callType">Voice Call</div>
+
+        <section>
+            <div class="avatar" id="callAvatar">🪐</div>
+            <h1 id="callName">Connecting...</h1>
+            <p class="username" id="callUsername">@loading</p>
+
+            <div class="video-area" id="videoArea">
+                Video will appear here
+            </div>
+
+            <p class="call-status" id="callStatus">Preparing call...</p>
+            <p class="call-timer" id="callTimer"></p>
+        </section>
+
+        <section class="call-controls">
+
+            <div class="control-item">
+                <button class="control-button" id="muteButton">🎙️</button>
+                <span class="control-label">Mute</span>
+            </div>
+
+            <div class="control-item">
+                <button class="control-button" id="speakerButton">🔊</button>
+                <span class="control-label">Speaker</span>
+            </div>
+
+            <div class="control-item">
+                <button class="control-button end-call" id="endCallButton">📞</button>
+                <span class="control-label">End</span>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
