@@ -200,102 +200,184 @@
         </section>
 
     </main>
-    <script>
-    // Read call information from the URL
-    const params = new URLSearchParams(window.location.search);
+<script type="module">
 
-    const connectionId = params.get("connection");
-    const callType = params.get("type");
+import { app } from "./js/firebase.js";
 
-    // Get interface elements
-    const callTypeElement = document.getElementById("callType");
-    const callStatus = document.getElementById("callStatus");
-    const muteButton = document.getElementById("muteButton");
-    const speakerButton = document.getElementById("speakerButton");
-    const endCallButton = document.getElementById("endCallButton");
-    const videoArea = document.getElementById("videoArea");
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
-    // Validate call information
-    if (!connectionId || !["voice", "video"].includes(callType)) {
-        callStatus.textContent = "Invalid call information.";
-    } else {
-        callTypeElement.textContent =
-            callType === "video" ? "Video Call" : "Voice Call";
+import {
+    getFirestore,
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-        callStatus.textContent = "Call interface ready.";
-        
-        if (callType === "video") {
-            videoArea.style.display = "flex";
-        }
-    }
 
-    // Mute button (interface state only for now)
-    let isMuted = false;
+// Firebase setup
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    muteButton.addEventListener("click", () => {
-        isMuted = !isMuted;
 
-        muteButton.textContent = isMuted ? "🔇" : "🎙️";
-        muteButton.nextElementSibling.textContent =
-            isMuted ? "Unmute" : "Mute";
-    });
+// Read call information from URL
+const params = new URLSearchParams(window.location.search);
 
-    // Speaker button (interface state only for now)
-    let isSpeakerOn = false;
+const connectionId = params.get("connection");
+const callType = params.get("type");
 
-    speakerButton.addEventListener("click", () => {
-        isSpeakerOn = !isSpeakerOn;
 
-        speakerButton.textContent = isSpeakerOn ? "🔈" : "🔊";
-        speakerButton.nextElementSibling.textContent =
-            isSpeakerOn ? "Speaker off" : "Speaker";
-    });
+// Interface elements
+const callTypeElement = document.getElementById("callType");
+const callStatus = document.getElementById("callStatus");
 
-    // End call button
-    endCallButton.addEventListener("click", () => {
+const callName = document.getElementById("callName");
+const callUsername = document.getElementById("callUsername");
+const callAvatar = document.getElementById("callAvatar");
 
-    // Stop microphone and camera
-    if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-    }
+const muteButton = document.getElementById("muteButton");
+const speakerButton = document.getElementById("speakerButton");
+const endCallButton = document.getElementById("endCallButton");
 
-    window.location.href =
-        `chat.html?connection=${encodeURIComponent(connectionId || "")}`;
-});
-        // WebRTC media preparation
-const startMediaButton =
-    document.getElementById("startMediaButton");
+const videoArea = document.getElementById("videoArea");
+const localVideo = document.getElementById("localVideo");
+const startMediaButton = document.getElementById("startMediaButton");
 
-const localVideo =
-    document.getElementById("localVideo");
 
+// Media variables
 let localStream = null;
+let isMuted = false;
+let isSpeakerOn = false;
 
-startMediaButton.addEventListener("click", async () => {
+
+// Validate URL information
+if (!connectionId || !["voice", "video"].includes(callType)) {
+
+    callStatus.textContent = "Invalid call information.";
+    startMediaButton.disabled = true;
+
+} else {
+
+    callTypeElement.textContent =
+        callType === "video" ? "Video Call" : "Voice Call";
+
+    if (callType === "video") {
+        videoArea.style.display = "flex";
+    }
+}
+
+
+// Load the other participant
+async function loadConnection(user) {
+
     try {
-        startMediaButton.disabled = true;
-        callStatus.textContent = "Requesting device permission...";
 
-        // Request microphone and, for video calls, camera
+        callStatus.textContent = "Finding your connection...";
+
+        const connectionRef = doc(
+            db,
+            "connections",
+            connectionId
+        );
+
+        const connectionSnap = await getDoc(connectionRef);
+
+        if (!connectionSnap.exists()) {
+            throw new Error("Connection does not exist.");
+        }
+
+        const connection = connectionSnap.data();
+
+        // Verify that the current user belongs to this connection
+        if (!connection.members.includes(user.uid)) {
+            throw new Error("You are not part of this connection.");
+        }
+
+        // Find the other participant
+        const otherUser = connection.users.find(
+            person => person.uid !== user.uid
+        );
+
+        if (!otherUser) {
+            throw new Error("Other participant not found.");
+        }
+
+        // Display their information
+        callName.textContent =
+            otherUser.displayName || "Meet Me User";
+
+        callUsername.textContent =
+            "@" + (otherUser.username || "unknown");
+
+        callAvatar.textContent =
+            otherUser.avatar || "🪐";
+
+        if (otherUser.avatarBackground) {
+            callAvatar.style.background =
+                otherUser.avatarBackground;
+        }
+
+        callStatus.textContent = "Connection verified. Ready to start.";
+
+    } catch (error) {
+
+        console.error("Connection loading error:", error);
+
+        callStatus.textContent =
+            error.message || "Could not load connection.";
+
+        startMediaButton.disabled = true;
+    }
+}
+
+
+// Authentication check
+onAuthStateChanged(auth, user => {
+
+    if (!user) {
+
+        callStatus.textContent = "Please log in first.";
+        startMediaButton.disabled = true;
+
+        return;
+    }
+
+    if (connectionId && ["voice", "video"].includes(callType)) {
+        loadConnection(user);
+    }
+
+});
+
+
+// Start microphone and camera
+startMediaButton.addEventListener("click", async () => {
+
+    try {
+
+        startMediaButton.disabled = true;
+
+        callStatus.textContent = "Requesting microphone and camera...";
+
         const constraints = {
             audio: true,
             video: callType === "video"
         };
 
-        localStream =
-            await navigator.mediaDevices.getUserMedia(constraints);
+        localStream = await navigator.mediaDevices.getUserMedia(
+            constraints
+        );
 
-        // Display local camera preview for video calls
         if (callType === "video") {
             localVideo.srcObject = localStream;
         }
 
-        callStatus.textContent =
-            "Microphone and camera are ready.";
+        callStatus.textContent = "Your media is ready.";
 
         startMediaButton.textContent = "Media ready";
 
     } catch (error) {
+
         console.error("Media access error:", error);
 
         callStatus.textContent =
@@ -303,8 +385,63 @@ startMediaButton.addEventListener("click", async () => {
 
         startMediaButton.disabled = false;
     }
+
 });
-    </script>
+
+
+// Mute and unmute microphone
+muteButton.addEventListener("click", () => {
+
+    if (!localStream) {
+        callStatus.textContent = "Enable your microphone first.";
+        return;
+    }
+
+    isMuted = !isMuted;
+
+    localStream.getAudioTracks().forEach(track => {
+        track.enabled = !isMuted;
+    });
+
+    muteButton.textContent = isMuted ? "🔇" : "🎙️";
+
+    muteButton.nextElementSibling.textContent =
+        isMuted ? "Unmute" : "Mute";
+
+});
+
+
+// Speaker button (actual output routing comes later)
+speakerButton.addEventListener("click", () => {
+
+    isSpeakerOn = !isSpeakerOn;
+
+    speakerButton.textContent =
+        isSpeakerOn ? "🔈" : "🔊";
+
+    speakerButton.nextElementSibling.textContent =
+        isSpeakerOn ? "Speaker off" : "Speaker";
+
+});
+
+
+// End call and release local media
+endCallButton.addEventListener("click", () => {
+
+    if (localStream) {
+
+        localStream.getTracks().forEach(track => {
+            track.stop();
+        });
+
+    }
+
+    window.location.href =
+        `chat.html?connection=${encodeURIComponent(connectionId || "")}`;
+
+});
+
+</script>
 
     
 </body>
