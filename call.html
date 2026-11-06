@@ -422,6 +422,519 @@ muteButton.addEventListener("click", () => {
     isMuted = !isMuted;
 
     localStream.getAudioTracks().forEach(track => {
+<script type="module">
+
+import { app } from "./js/firebase.js";
+
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    collection,
+    addDoc,
+    setDoc,
+    updateDoc,
+    onSnapshot,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+
+// Firebase setup
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+// URL information
+const params = new URLSearchParams(window.location.search);
+
+const connectionId = params.get("connection");
+const callType = params.get("type");
+
+
+// Interface elements
+const callTypeElement = document.getElementById("callType");
+const callStatus = document.getElementById("callStatus");
+
+const callName = document.getElementById("callName");
+const callUsername = document.getElementById("callUsername");
+const callAvatar = document.getElementById("callAvatar");
+
+const muteButton = document.getElementById("muteButton");
+const speakerButton = document.getElementById("speakerButton");
+const endCallButton = document.getElementById("endCallButton");
+
+const videoArea = document.getElementById("videoArea");
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+const remoteAudio = document.getElementById("remoteAudio");
+
+const startMediaButton = document.getElementById("startMediaButton");
+
+
+// Call variables
+let currentUser = null;
+let otherUserUid = null;
+
+let localStream = null;
+let peerConnection = null;
+let callDocRef = null;
+
+let unsubscribeCall = null;
+let unsubscribeCandidates = null;
+
+let isMuted = false;
+let isSpeakerOn = false;
+
+let pendingRemoteCandidates = [];
+let pendingLocalCandidates = [];
+
+
+// STUN configuration for initial testing
+const rtcConfiguration = {
+    iceServers: [
+        {
+            urls: "stun:stun.l.google.com:19302"
+        }
+    ]
+};
+
+
+// Validate URL
+if (!connectionId || !["voice", "video"].includes(callType)) {
+
+    callStatus.textContent = "Invalid call information.";
+    startMediaButton.disabled = true;
+
+} else {
+
+    callTypeElement.textContent =
+        callType === "video" ? "Video Call" : "Voice Call";
+
+    if (callType === "video") {
+        videoArea.style.display = "flex";
+    }
+
+}
+
+
+// Load connection information
+async function loadConnection(user) {
+
+    try {
+
+        callStatus.textContent = "Finding your connection...";
+
+        const connectionRef = doc(
+            db,
+            "connections",
+            connectionId
+        );
+
+        const connectionSnap = await getDoc(connectionRef);
+
+        if (!connectionSnap.exists()) {
+            throw new Error("Connection does not exist.");
+        }
+
+        const connection = connectionSnap.data();
+
+        if (!connection.members.includes(user.uid)) {
+            throw new Error("You are not part of this connection.");
+        }
+
+        const otherUser = connection.users.find(
+            person => person.uid !== user.uid
+        );
+
+        if (!otherUser) {
+            throw new Error("Other participant not found.");
+        }
+
+        otherUserUid = otherUser.uid;
+
+        callName.textContent =
+            otherUser.displayName || "Meet Me User";
+
+        callUsername.textContent =
+            "@" + (otherUser.username || "unknown");
+
+        callAvatar.textContent =
+            otherUser.avatar || "🪐";
+
+        if (otherUser.avatarBackground) {
+            callAvatar.style.background =
+                otherUser.avatarBackground;
+        }
+
+        callStatus.textContent = "Connection verified. Ready to call.";
+
+        startMediaButton.disabled = false;
+
+    } catch (error) {
+
+        console.error("Connection error:", error);
+
+        callStatus.textContent =
+            error.message || "Could not load connection.";
+
+        startMediaButton.disabled = true;
+
+    }
+
+}
+
+
+// Authentication
+startMediaButton.disabled = true;
+
+onAuthStateChanged(auth, user => {
+
+    if (!user) {
+
+        callStatus.textContent = "Please log in first.";
+        startMediaButton.disabled = true;
+
+        return;
+    }
+
+    currentUser = user;
+
+    if (connectionId && ["voice", "video"].includes(callType)) {
+        loadConnection(user);
+    }
+
+});
+
+
+// Add local ICE candidates to Firestore
+async function saveLocalCandidate(candidate) {
+
+    if (!callDocRef) {
+
+        pendingLocalCandidates.push(candidate);
+        return;
+
+    }
+
+    await addDoc(
+        collection(callDocRef, "callerCandidates"),
+        candidate.toJSON()
+    );
+
+}
+
+
+// Flush candidates collected before call document creation
+async function flushLocalCandidates() {
+
+    const candidates = [...pendingLocalCandidates];
+
+    pendingLocalCandidates = [];
+
+    for (const candidate of candidates) {
+        await saveLocalCandidate(candidate);
+    }
+
+}
+
+
+// Add remote ICE candidates
+async function flushRemoteCandidates() {
+
+    if (!peerConnection.remoteDescription) {
+        return;
+    }
+
+    const candidates = [...pendingRemoteCandidates];
+
+    pendingRemoteCandidates = [];
+
+    for (const candidate of candidates) {
+
+        await peerConnection.addIceCandidate(
+            new RTCIceCandidate(candidate)
+        );
+
+    }
+
+}
+
+
+// Start outgoing call
+startMediaButton.addEventListener("click", async () => {
+
+    try {
+
+        if (!currentUser || !otherUserUid) {
+            throw new Error("Connection information is not ready.");
+        }
+
+        startMediaButton.disabled = true;
+
+        callStatus.textContent = "Requesting microphone and camera...";
+
+        // Get microphone and camera
+        localStream = await navigator.mediaDevices.getUserMedia({
+
+            audio: true,
+
+            video: callType === "video"
+
+        });
+
+
+        if (callType === "video") {
+            localVideo.srcObject = localStream;
+        }
+
+
+        callStatus.textContent = "Creating secure connection...";
+
+
+        // Create WebRTC peer connection
+        peerConnection = new RTCPeerConnection(rtcConfiguration);
+
+
+        // Add local media tracks
+        localStream.getTracks().forEach(track => {
+
+            peerConnection.addTrack(track, localStream);
+
+        });
+
+
+        // Receive remote media
+        peerConnection.ontrack = event => {
+
+            const remoteStream = event.streams[0];
+
+            if (callType === "video") {
+
+                remoteVideo.srcObject = remoteStream;
+                remoteVideo.style.display = "block";
+
+            } else {
+
+                remoteAudio.srcObject = remoteStream;
+
+            }
+
+        };
+
+
+        // Monitor connection
+        peerConnection.onconnectionstatechange = () => {
+
+            console.log(
+                "WebRTC connection:",
+                peerConnection.connectionState
+            );
+
+            if (peerConnection.connectionState === "connected") {
+
+                callStatus.textContent = "Call connected.";
+
+            } else if (
+                peerConnection.connectionState === "disconnected"
+            ) {
+
+                callStatus.textContent = "Connection interrupted.";
+
+            } else if (
+                peerConnection.connectionState === "failed"
+            ) {
+
+                callStatus.textContent = "Connection failed.";
+
+            }
+
+        };
+
+
+        // Collect local ICE candidates
+        peerConnection.onicecandidate = async event => {
+
+            if (event.candidate) {
+
+                try {
+
+                    await saveLocalCandidate(event.candidate);
+
+                } catch (error) {
+
+                    console.error("ICE candidate error:", error);
+
+                }
+
+            }
+
+        };
+
+
+        // Create Firestore call document reference
+        callDocRef = doc(collection(db, "calls"));
+
+
+        // Create offer
+        const offer = await peerConnection.createOffer();
+
+        await peerConnection.setLocalDescription(offer);
+
+
+        // Save offer in Firestore
+        await setDoc(callDocRef, {
+
+            callerUid: currentUser.uid,
+
+            calleeUid: otherUserUid,
+
+            connectionId: connectionId,
+
+            type: callType,
+
+            status: "ringing",
+
+            offer: {
+                type: peerConnection.localDescription.type,
+                sdp: peerConnection.localDescription.sdp
+            },
+
+            createdAt: serverTimestamp()
+
+        });
+
+
+        // Save candidates collected during offer creation
+        await flushLocalCandidates();
+
+
+        callStatus.textContent = "Calling... Waiting for answer.";
+
+        startMediaButton.textContent = "Calling...";
+
+
+        // Listen for the receiver's answer
+        unsubscribeCall = onSnapshot(callDocRef, async snapshot => {
+
+            if (!snapshot.exists()) {
+                return;
+            }
+
+            const callData = snapshot.data();
+
+            if (
+                callData.answer &&
+                !peerConnection.currentRemoteDescription
+            ) {
+
+                try {
+
+                    await peerConnection.setRemoteDescription(
+                        new RTCSessionDescription(callData.answer)
+                    );
+
+                    await flushRemoteCandidates();
+
+                    callStatus.textContent = "Answer received. Connecting...";
+
+                } catch (error) {
+
+                    console.error("Answer error:", error);
+
+                    callStatus.textContent = "Could not process call answer.";
+
+                }
+
+            }
+
+            if (callData.status === "rejected") {
+
+                callStatus.textContent = "Call was declined.";
+
+            }
+
+            if (callData.status === "ended") {
+
+                callStatus.textContent = "Call ended.";
+
+            }
+
+        });
+
+
+        // Listen for receiver's ICE candidates
+        unsubscribeCandidates = onSnapshot(
+            collection(callDocRef, "calleeCandidates"),
+
+            async snapshot => {
+
+                for (const change of snapshot.docChanges()) {
+
+                    if (change.type !== "added") {
+                        continue;
+                    }
+
+                    const candidate = change.doc.data();
+
+                    try {
+
+                        if (peerConnection.remoteDescription) {
+
+                            await peerConnection.addIceCandidate(
+                                new RTCIceCandidate(candidate)
+                            );
+
+                        } else {
+
+                            pendingRemoteCandidates.push(candidate);
+
+                        }
+
+                    } catch (error) {
+
+                        console.error("Remote ICE error:", error);
+
+                    }
+
+                }
+
+            }
+
+        );
+
+
+    } catch (error) {
+
+        console.error("Call setup error:", error);
+
+        callStatus.textContent =
+            error.message || "Could not start the call.";
+
+        startMediaButton.disabled = false;
+
+    }
+
+});
+
+
+// Mute and unmute
+muteButton.addEventListener("click", () => {
+
+    if (!localStream) {
+
+        callStatus.textContent = "Enable your microphone first.";
+        return;
+
+    }
+
+    isMuted = !isMuted;
+
+    localStream.getAudioTracks().forEach(track => {
         track.enabled = !isMuted;
     });
 
@@ -433,7 +946,7 @@ muteButton.addEventListener("click", () => {
 });
 
 
-// Speaker button (actual output routing comes later)
+// Speaker button
 speakerButton.addEventListener("click", () => {
 
     isSpeakerOn = !isSpeakerOn;
@@ -447,8 +960,37 @@ speakerButton.addEventListener("click", () => {
 });
 
 
-// End call and release local media
-endCallButton.addEventListener("click", () => {
+// End call
+endCallButton.addEventListener("click", async () => {
+
+    try {
+
+        if (callDocRef) {
+
+            await updateDoc(callDocRef, {
+                status: "ended"
+            });
+
+        }
+
+    } catch (error) {
+
+        console.error("Could not update call status:", error);
+
+    }
+
+
+    if (unsubscribeCall) {
+        unsubscribeCall();
+    }
+
+    if (unsubscribeCandidates) {
+        unsubscribeCandidates();
+    }
+
+    if (peerConnection) {
+        peerConnection.close();
+    }
 
     if (localStream) {
 
