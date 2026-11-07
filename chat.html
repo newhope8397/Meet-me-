@@ -326,6 +326,20 @@
 
         <section class="messages-card">
 
+            <div id="incomingCallBox" style="
+    display: none;
+    margin-top: 12px;
+    padding: 16px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #39206b, #12465a);
+    border: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+">
+    <p id="incomingCallText">
+        Incoming call...
+    </p>
+            </div>
+
             <div id="messages" class="messages">
                 <p class="empty-message">
                     Loading messages...
@@ -371,7 +385,8 @@
             serverTimestamp,
             query,
             orderBy,
-            onSnapshot
+            onSnapshot,
+            where
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
         const auth = getAuth(app);
@@ -403,6 +418,11 @@
 
         const statusMessage =
             document.getElementById("statusMessage");
+        const incomingCallBox =
+    document.getElementById("incomingCallBox");
+
+const incomingCallText =
+    document.getElementById("incomingCallText");
 
         const urlParams =
             new URLSearchParams(window.location.search);
@@ -447,6 +467,7 @@ videoCallButton.addEventListener("click", () => {
         let currentUser = null;
         let currentConnection = null;
         let unsubscribeMessages = null;
+        let unsubscribeIncomingCalls = null;
 
         function showStatus(message) {
             statusMessage.textContent = message;
@@ -627,6 +648,66 @@ videoCallButton.addEventListener("click", () => {
                     }
                 );
         }
+        
+        // Listen for incoming calls
+function listenForIncomingCalls() {
+
+    if (unsubscribeIncomingCalls) {
+        unsubscribeIncomingCalls();
+    }
+
+    const callsReference = collection(db, "calls");
+
+    const incomingCallsQuery = query(
+        callsReference,
+        where("calleeUid", "==", currentUser.uid),
+        where("connectionId", "==", connectionId),
+        where("status", "==", "ringing")
+    );
+
+    unsubscribeIncomingCalls = onSnapshot(
+        incomingCallsQuery,
+
+        snapshot => {
+
+            if (snapshot.empty) {
+                incomingCallBox.style.display = "none";
+                return;
+            }
+
+            const incomingCall = snapshot.docs[0];
+
+            const callData = incomingCall.data();
+
+            const callerName = chatName.textContent;
+
+            const type =
+                callData.type === "video"
+                    ? "Video"
+                    : "Voice";
+
+            incomingCallText.textContent =
+                `Incoming ${type} call from ${callerName}`;
+
+            incomingCallBox.style.display = "block";
+
+            console.log(
+                "Incoming call detected:",
+                incomingCall.id
+            );
+
+        },
+
+        error => {
+
+            console.error(
+                "Incoming call listener error:",
+                error
+            );
+
+        }
+    );
+}
 
         composer.addEventListener("submit", async event => {
             event.preventDefault();
@@ -704,7 +785,8 @@ videoCallButton.addEventListener("click", () => {
                     await loadConnection();
 
                 if (connectionLoaded) {
-                    listenForMessages();
+    listenForMessages();
+    listenForIncomingCalls();
                 }
 
             } catch (error) {
