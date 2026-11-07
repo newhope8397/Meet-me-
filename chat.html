@@ -326,18 +326,50 @@
 
         <section class="messages-card">
 
-            <div id="incomingCallBox" style="
-    display: none;
-    margin-top: 12px;
-    padding: 16px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #39206b, #12465a);
-    border: 1px solid rgba(255,255,255,0.2);
-    text-align: center;
-">
-    <p id="incomingCallText">
+            <div id="incomingCallBox"
+     style="
+        display: none;
+        padding: 18px;
+        margin: 15px 0;
+        border-radius: 16px;
+        background: #171329;
+        border: 1px solid rgba(167,139,250,0.3);
+        text-align: center;
+     ">
+
+    <p id="incomingCallText"
+       style="margin-bottom: 15px;">
         Incoming call...
     </p>
+
+    <div style="display:flex; gap:12px; justify-content:center;">
+
+        <button id="acceptCallButton"
+                style="
+                    padding: 11px 20px;
+                    border: none;
+                    border-radius: 10px;
+                    background: #16a34a;
+                    color: white;
+                    cursor: pointer;
+                ">
+            Accept
+        </button>
+
+        <button id="rejectCallButton"
+                style="
+                    padding: 11px 20px;
+                    border: none;
+                    border-radius: 10px;
+                    background: #e53955;
+                    color: white;
+                    cursor: pointer;
+                ">
+            Reject
+        </button>
+
+    </div>
+
             </div>
 
             <div id="messages" class="messages">
