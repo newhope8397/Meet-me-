@@ -791,6 +791,22 @@ function listenForIncomingCalls() {
 
 });
 
+        acceptCallButton.addEventListener("click", () => {
+
+    if (!incomingCallId || !incomingCallType) {
+        return;
+    }
+
+    acceptCallButton.disabled = true;
+
+    window.location.href =
+        `call.html?connection=${encodeURIComponent(connectionId)}` +
+        `&type=${encodeURIComponent(incomingCallType)}` +
+        `&call=${encodeURIComponent(incomingCallId)}` +
+        `&role=receiver`;
+
+});
+
         composer.addEventListener("submit", async event => {
             event.preventDefault();
 
