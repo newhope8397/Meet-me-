@@ -456,6 +456,14 @@
 
 const incomingCallText =
     document.getElementById("incomingCallText");
+        const acceptCallButton =
+    document.getElementById("acceptCallButton");
+
+const rejectCallButton =
+    document.getElementById("rejectCallButton");
+
+let incomingCallId = null;
+let incomingCallType = null;
 
         const urlParams =
             new URLSearchParams(window.location.search);
@@ -697,14 +705,7 @@ function listenForIncomingCalls() {
         where("connectionId", "==", connectionId),
         where("status", "==", "ringing")
     );
-    const acceptCallButton =
-    document.getElementById("acceptCallButton");
-
-const rejectCallButton =
-    document.getElementById("rejectCallButton");
-
-let incomingCallId = null;
-let incomingCallType = null;
+    
 
     unsubscribeIncomingCalls = onSnapshot(
         incomingCallsQuery,
