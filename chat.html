@@ -414,6 +414,7 @@
             getDoc,
             collection,
             addDoc,
+            updateDoc,
             serverTimestamp,
             query,
             orderBy,
@@ -696,6 +697,14 @@ function listenForIncomingCalls() {
         where("connectionId", "==", connectionId),
         where("status", "==", "ringing")
     );
+    const acceptCallButton =
+    document.getElementById("acceptCallButton");
+
+const rejectCallButton =
+    document.getElementById("rejectCallButton");
+
+let incomingCallId = null;
+let incomingCallType = null;
 
     unsubscribeIncomingCalls = onSnapshot(
         incomingCallsQuery,
@@ -703,13 +712,17 @@ function listenForIncomingCalls() {
         snapshot => {
 
             if (snapshot.empty) {
-                incomingCallBox.style.display = "none";
-                return;
+    incomingCallBox.style.display = "none";
+    incomingCallId = null;
+    incomingCallType = null;
+    return;
             }
 
             const incomingCall = snapshot.docs[0];
 
             const callData = incomingCall.data();
+            incomingCallId = incomingCall.id;
+            incomingCallType = callData.type;
 
             const callerName = chatName.textContent;
 
@@ -740,6 +753,42 @@ function listenForIncomingCalls() {
         }
     );
 }
+
+        rejectCallButton.addEventListener("click", async () => {
+
+    if (!incomingCallId) {
+        return;
+    }
+
+    try {
+
+        rejectCallButton.disabled = true;
+
+        await updateDoc(
+            doc(db, "calls", incomingCallId),
+            {
+                status: "rejected"
+            }
+        );
+
+        incomingCallBox.style.display = "none";
+
+        incomingCallId = null;
+        incomingCallType = null;
+
+    } catch (error) {
+
+        console.error("Call rejection error:", error);
+
+        showStatus("Could not reject the call.");
+
+    } finally {
+
+        rejectCallButton.disabled = false;
+
+    }
+
+});
 
         composer.addEventListener("submit", async event => {
             event.preventDefault();
