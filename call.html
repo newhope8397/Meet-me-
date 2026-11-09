@@ -303,7 +303,12 @@ const rtcConfiguration = {
 
 
 // Validate URL
-if (!connectionId || !["voice", "video"].includes(callType)) {
+if (
+    !connectionId ||
+    !["voice", "video"].includes(callType) ||
+    !["caller", "receiver"].includes(role) ||
+    (role === "receiver" && !callId)
+) {
 
     callStatus.textContent = "Invalid call information.";
     startMediaButton.disabled = true;
