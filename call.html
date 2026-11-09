@@ -389,6 +389,7 @@ if (role === "receiver") {
     }
 
     console.log("Incoming call verified:", callId);
+    callDocumentCreated = true;
 }
 
         callName.textContent =
@@ -455,13 +456,17 @@ async function saveLocalCandidate(candidate) {
 
     }
 
+    const candidateCollection =
+        role === "receiver"
+            ? "calleeCandidates"
+            : "callerCandidates";
+
     await addDoc(
-        collection(callDocRef, "callerCandidates"),
+        collection(callDocRef, candidateCollection),
         candidate.toJSON()
     );
 
 }
-
 
 // Flush candidates collected before call document creation
 async function flushLocalCandidates() {
@@ -498,14 +503,252 @@ async function flushRemoteCandidates() {
 
 }
 
+ // Start incoming call
+async function startIncomingCall() {
+
+    try {
+
+        if (!currentUser || !otherUserUid || !callDocRef) {
+            throw new Error("Incoming call information is missing.");
+        }
+
+        startMediaButton.disabled = true;
+
+        callStatus.textContent =
+            "Requesting microphone and camera...";
+
+
+        // Get microphone and camera
+        localStream = await navigator.mediaDevices.getUserMedia({
+
+            audio: true,
+
+            video: callType === "video"
+
+        });
+
+
+        if (callType === "video") {
+            localVideo.srcObject = localStream;
+        }
+
+
+        callStatus.textContent =
+            "Preparing to answer the call...";
+
+
+        // Create WebRTC peer connection
+        peerConnection = new RTCPeerConnection(rtcConfiguration);
+
+
+        // Add local media tracks
+        localStream.getTracks().forEach(track => {
+
+            peerConnection.addTrack(track, localStream);
+
+        });
+
+
+        // Receive caller's media
+        peerConnection.ontrack = event => {
+
+            const remoteStream = event.streams[0];
+
+            if (callType === "video") {
+
+                remoteVideo.srcObject = remoteStream;
+                remoteVideo.style.display = "block";
+
+            } else {
+
+                remoteAudio.srcObject = remoteStream;
+
+            }
+
+        };
+
+
+        // Monitor connection
+        peerConnection.onconnectionstatechange = () => {
+
+            const state = peerConnection.connectionState;
+
+            console.log("WebRTC connection:", state);
+
+            if (state === "connected") {
+
+                callStatus.textContent = "Call connected.";
+
+            } else if (state === "disconnected") {
+
+                callStatus.textContent = "Connection interrupted.";
+
+            } else if (state === "failed") {
+
+                callStatus.textContent = "Connection failed.";
+
+            }
+
+        };
+
+
+        // Save receiver's ICE candidates
+        peerConnection.onicecandidate = async event => {
+
+            if (event.candidate) {
+
+                try {
+
+                    await saveLocalCandidate(event.candidate);
+
+                } catch (error) {
+
+                    console.error("Receiver ICE error:", error);
+
+                }
+
+            }
+
+        };
+
+
+        // Listen for caller's ICE candidates
+        unsubscribeCandidates = onSnapshot(
+            collection(callDocRef, "callerCandidates"),
+
+            async snapshot => {
+
+                for (const change of snapshot.docChanges()) {
+
+                    if (change.type !== "added") {
+                        continue;
+                    }
+
+                    const candidate = change.doc.data();
+
+                    try {
+
+                        if (peerConnection.remoteDescription) {
+
+                            await peerConnection.addIceCandidate(
+                                new RTCIceCandidate(candidate)
+                            );
+
+                        } else {
+
+                            pendingRemoteCandidates.push(candidate);
+
+                        }
+
+                    } catch (error) {
+
+                        console.error("Caller ICE error:", error);
+
+                    }
+
+                }
+
+            }
+
+        );
+
+
+        // Listen for call status changes
+        unsubscribeCall = onSnapshot(callDocRef, snapshot => {
+
+            if (!snapshot.exists()) {
+                return;
+            }
+
+            const callData = snapshot.data();
+
+            if (callData.status === "ended") {
+
+                callStatus.textContent = "Call ended.";
+
+            } else if (callData.status === "rejected") {
+
+                callStatus.textContent = "Call was declined.";
+
+            }
+
+        });
+
+
+        // Receive caller's offer
+        const callSnapshot = await getDoc(callDocRef);
+
+        if (!callSnapshot.exists()) {
+            throw new Error("This call no longer exists.");
+        }
+
+        const callData = callSnapshot.data();
+
+        if (
+            callData.status !== "ringing" ||
+            callData.calleeUid !== currentUser.uid ||
+            !callData.offer
+        ) {
+            throw new Error("This call is no longer available.");
+        }
+
+
+        await peerConnection.setRemoteDescription(
+            new RTCSessionDescription(callData.offer)
+        );
+
+
+        // Add any ICE candidates received before the offer
+        await flushRemoteCandidates();
+
+
+        // Create answer
+        const answer = await peerConnection.createAnswer();
+
+        await peerConnection.setLocalDescription(answer);
+
+
+        // Save answer and accept the call
+        await updateDoc(callDocRef, {
+
+            answer: {
+
+                type: peerConnection.localDescription.type,
+
+                sdp: peerConnection.localDescription.sdp
+
+            },
+
+            status: "accepted"
+
+        });
+
+
+        callStatus.textContent =
+            "Call accepted. Connecting...";
+
+        startMediaButton.textContent = "Call accepted";
+
+
+    } catch (error) {
+
+        console.error("Incoming call error:", error);
+
+        callStatus.textContent =
+            error.message || "Could not answer the call.";
+
+        startMediaButton.disabled = false;
+
+    }
+
+    }
+
     
 // Start outgoing call
 startMediaButton.addEventListener("click", async () => {
 
-    // Receiver mode will use a separate answer process.
     if (role === "receiver") {
-        callStatus.textContent =
-            "Incoming call setup is being prepared.";
+        await startIncomingCall();
         return;
     }
 
