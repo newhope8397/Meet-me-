@@ -250,7 +250,8 @@ const params = new URLSearchParams(window.location.search);
 
 const connectionId = params.get("connection");
 const callType = params.get("type");
-
+const callId = params.get("call");
+const role = params.get("role") || "caller";
 
 // Interface elements
 const callTypeElement = document.getElementById("callType");
