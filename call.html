@@ -498,9 +498,16 @@ async function flushRemoteCandidates() {
 
 }
 
-
+    
 // Start outgoing call
 startMediaButton.addEventListener("click", async () => {
+
+    // Receiver mode will use a separate answer process.
+    if (role === "receiver") {
+        callStatus.textContent =
+            "Incoming call setup is being prepared.";
+        return;
+    }
 
     try {
 
