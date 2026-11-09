@@ -355,6 +355,37 @@ async function loadConnection(user) {
 
         otherUserUid = otherUser.uid;
 
+        // Verify incoming call
+if (role === "receiver") {
+
+    if (!callId) {
+        throw new Error("Call ID is missing.");
+    }
+
+    callDocRef = doc(db, "calls", callId);
+
+    const callSnapshot = await getDoc(callDocRef);
+
+    if (!callSnapshot.exists()) {
+        throw new Error("This call no longer exists.");
+    }
+
+    const callData = callSnapshot.data();
+
+    if (
+        callData.calleeUid !== user.uid ||
+        callData.callerUid !== otherUserUid ||
+        callData.connectionId !== connectionId ||
+        callData.type !== callType ||
+        callData.status !== "ringing" ||
+        !callData.offer
+    ) {
+        throw new Error("This incoming call is invalid or has expired.");
+    }
+
+    console.log("Incoming call verified:", callId);
+}
+
         callName.textContent =
             otherUser.displayName || "Meet Me User";
 
